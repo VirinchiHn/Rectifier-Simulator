@@ -1,0 +1,3273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rectifier Bench (24EE10042-Virinchi) — Power-Electronics Simulator</title>
+  <meta name="description" content="Interactive power-electronics rectifier simulator with live waveforms, SVG schematics, and analytical results." />
+  <meta property="og:title" content="Rectifier Bench (24EE10042-Virinchi) — Power-Electronics Simulator" />
+  <meta property="og:description" content="Interactive power-electronics rectifier simulator with live waveforms, SVG schematics, and analytical results." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <style>
+    /* ==========================================================================
+       THEME & DESIGN SYSTEM (Rectifier Bench)
+       ========================================================================== */
+    :root {
+      --bg: #0e1420;
+      --panel: #151d2e;
+      --panel-hover: #1b253b;
+      --line: #2a3550;
+      --line-subtle: #1c263c;
+      --ink: #e6ecf8;
+      --mute: #8b97b3;
+      --green: #3ddc97;
+      --green-glow: rgba(61, 220, 151, 0.35);
+      --blue: #5aa9ff;
+      --blue-glow: rgba(90, 169, 255, 0.35);
+      --amber: #ffb454;
+      --amber-glow: rgba(255, 180, 84, 0.35);
+      --violet: #b79cff;
+      --cyan: #22d3ee;
+      --pink: #f472b6;
+      --danger: #ef4444;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      --font: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        --bg: #f3f6fc;
+        --panel: #ffffff;
+        --panel-hover: #f8fafc;
+        --line: #d2dcf0;
+        --line-subtle: #e2e8f0;
+        --ink: #121826;
+        --mute: #5a6885;
+        --green: #0ea668;
+        --green-glow: rgba(14, 166, 104, 0.25);
+        --blue: #2563eb;
+        --blue-glow: rgba(37, 99, 235, 0.25);
+        --amber: #d97706;
+        --amber-glow: rgba(217, 119, 6, 0.25);
+        --violet: #7c3aed;
+        --cyan: #0891b2;
+        --pink: #db2777;
+        --danger: #dc2626;
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+    }
+
+    :root[data-theme="light"] {
+      --bg: #f3f6fc;
+      --panel: #ffffff;
+      --panel-hover: #f8fafc;
+      --line: #d2dcf0;
+      --line-subtle: #e2e8f0;
+      --ink: #121826;
+      --mute: #5a6885;
+      --green: #0ea668;
+      --green-glow: rgba(14, 166, 104, 0.25);
+      --blue: #2563eb;
+      --blue-glow: rgba(37, 99, 235, 0.25);
+      --amber: #d97706;
+      --amber-glow: rgba(217, 119, 6, 0.25);
+      --violet: #7c3aed;
+      --cyan: #0891b2;
+      --pink: #db2777;
+      --danger: #dc2626;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0e1420;
+      --panel: #151d2e;
+      --panel-hover: #1b253b;
+      --line: #2a3550;
+      --line-subtle: #1c263c;
+      --ink: #e6ecf8;
+      --mute: #8b97b3;
+      --green: #3ddc97;
+      --green-glow: rgba(61, 220, 151, 0.35);
+      --blue: #5aa9ff;
+      --blue-glow: rgba(90, 169, 255, 0.35);
+      --amber: #ffb454;
+      --amber-glow: rgba(255, 180, 84, 0.35);
+      --violet: #b79cff;
+      --cyan: #22d3ee;
+      --pink: #f472b6;
+      --danger: #ef4444;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Base Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1320px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 4px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1e3a8a, #0284c7);
+      border: 1px solid var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 20px;
+      box-shadow: 0 2px 10px var(--blue-glow);
+    }
+
+    .title-area h1 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+
+    .title-area p {
+      font-size: 14px;
+      color: var(--mute);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--panel-hover);
+      border-color: var(--mute);
+    }
+
+    /* Common Card */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--mute);
+      margin-bottom: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* Layout: Top 2 Cards */
+    .two-cards-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 860px) {
+      .two-cards-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* LEFT CARD: Schematic & Live Readout */
+    .schematic-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .schematic-container {
+      width: 100%;
+      height: 330px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .schematic-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* SVG Schematic Styling */
+    .wire {
+      stroke: var(--line);
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      transition: stroke 0.1s ease;
+    }
+
+    .wire.active {
+      stroke: var(--green);
+      stroke-width: 3.2;
+      filter: drop-shadow(0 0 5px var(--green-glow));
+    }
+
+    .wire.active-amber {
+      stroke: var(--amber);
+      stroke-width: 3.2;
+      filter: drop-shadow(0 0 5px var(--amber-glow));
+    }
+
+    .junction-dot {
+      fill: var(--line);
+      transition: fill 0.1s ease;
+    }
+
+    .junction-dot.active {
+      fill: var(--green);
+    }
+
+    .device-body {
+      fill: var(--panel);
+      stroke: var(--mute);
+      stroke-width: 2;
+      transition: all 0.1s ease;
+    }
+
+    .device-body.active {
+      fill: var(--green);
+      stroke: var(--green);
+      filter: drop-shadow(0 0 8px var(--green-glow));
+    }
+
+    .device-body.active-amber {
+      fill: var(--amber);
+      stroke: var(--amber);
+      filter: drop-shadow(0 0 8px var(--amber-glow));
+    }
+
+    .device-label {
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 600;
+      fill: var(--mute);
+      text-anchor: middle;
+      dominant-baseline: middle;
+      user-select: none;
+    }
+
+    .device-label.active {
+      fill: var(--green);
+      font-weight: 700;
+    }
+
+    .source-symbol circle {
+      fill: var(--panel);
+      stroke: var(--blue);
+      stroke-width: 2;
+    }
+
+    .source-symbol path {
+      stroke: var(--blue);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .source-label {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      fill: var(--blue);
+      text-anchor: middle;
+      dominant-baseline: middle;
+      user-select: none;
+    }
+
+    .load-box {
+      fill: var(--panel);
+      stroke: var(--mute);
+      stroke-width: 2;
+      rx: 6;
+      transition: stroke 0.1s ease;
+    }
+
+    .load-box.active {
+      stroke: var(--green);
+      filter: drop-shadow(0 0 6px var(--green-glow));
+    }
+
+    /* Live Readouts Row */
+    .live-readouts-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 580px) {
+      .live-readouts-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .live-readouts-grid .readout-item:last-child {
+        grid-column: span 2;
+      }
+    }
+
+    .readout-item {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .readout-label {
+      font-size: 11px;
+      color: var(--mute);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .readout-val {
+      font-size: 16px;
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .readout-val.active-device {
+      color: var(--green);
+      font-size: 14px;
+    }
+
+    /* RIGHT CARD: Waveforms & Control Row */
+    .waveform-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .legend-chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .legend-chip {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+
+    .legend-chip:hover {
+      background: var(--panel-hover);
+      border-color: var(--mute);
+    }
+
+    .legend-chip[aria-pressed="false"] {
+      opacity: 0.38;
+      text-decoration: line-through;
+    }
+
+    .legend-color-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      height: 470px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    #waveform-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Waveform Tooltip */
+    .canvas-tooltip {
+      position: absolute;
+      pointer-events: none;
+      display: none;
+      z-index: 10;
+      background: rgba(14, 20, 32, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--ink);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+    }
+
+    .canvas-tooltip-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 2px;
+    }
+
+    .canvas-tooltip-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .canvas-tooltip-label {
+      color: var(--mute);
+    }
+
+    .canvas-tooltip-val {
+      font-weight: 700;
+    }
+
+    /* Canvas Controls Row */
+    .canvas-controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line-subtle);
+    }
+
+    .btn-play {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      min-width: 95px;
+      justify-content: center;
+    }
+
+    .btn-play:hover {
+      background: var(--panel-hover);
+      border-color: var(--mute);
+    }
+
+    .btn-play.playing {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+      box-shadow: 0 0 10px var(--blue-glow);
+    }
+
+    .slider-time-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .slider-time-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--mute);
+      white-space: nowrap;
+    }
+
+    .slider-time-group input[type="range"] {
+      flex: 1;
+      height: 6px;
+      background: var(--line);
+      border-radius: 3px;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .slider-time-group input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--blue);
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 0 6px var(--blue-glow);
+    }
+
+    .time-degree-readout {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--ink);
+      min-width: 58px;
+      text-align: right;
+    }
+
+    .speed-select-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .speed-select-group label {
+      font-size: 13px;
+      color: var(--mute);
+    }
+
+    .speed-btn-group {
+      display: flex;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .speed-btn {
+      background: transparent;
+      border: none;
+      color: var(--mute);
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .speed-btn:hover {
+      color: var(--ink);
+    }
+
+    .speed-btn.active {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    /* Controls 3-Card Row */
+    .controls-three-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    /* Control Groups */
+    .control-section {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .control-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-field-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .control-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--mute);
+    }
+
+    .control-val-badge {
+      font-size: 13px;
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: var(--ink);
+    }
+
+    /* Segmented Buttons */
+    .seg-group {
+      display: flex;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .seg-btn {
+      flex: 1;
+      background: var(--panel);
+      border: none;
+      border-radius: 6px;
+      color: var(--mute);
+      padding: 7px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .seg-btn:hover:not(:disabled) {
+      color: var(--ink);
+      background: var(--panel-hover);
+    }
+
+    .seg-btn.active {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .seg-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    /* Range Sliders */
+    .range-input {
+      width: 100%;
+      height: 6px;
+      background: var(--line);
+      border-radius: 3px;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .range-input:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .range-input::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--blue);
+      cursor: pointer;
+      border: 2px solid #fff;
+    }
+
+    .range-input:disabled::-webkit-slider-thumb {
+      background: var(--mute);
+      cursor: not-allowed;
+    }
+
+    /* Presets Container */
+    .presets-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .presets-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--mute);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .presets-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .preset-btn {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--ink);
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-btn:hover {
+      background: var(--panel-hover);
+      border-color: var(--mute);
+      color: var(--blue);
+    }
+
+    .info-note {
+      font-size: 12px;
+      color: var(--mute);
+      line-height: 1.4;
+      background: var(--bg);
+      border: 1px solid var(--line-subtle);
+      border-radius: 6px;
+      padding: 8px 10px;
+    }
+
+    /* RESULTS CARD */
+    .results-card {
+      padding: 20px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .stat-box {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-name {
+      font-size: 12px;
+      color: var(--mute);
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: var(--ink);
+    }
+
+    .mode-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      width: fit-content;
+    }
+
+    .mode-badge.continuous {
+      background: rgba(61, 220, 151, 0.15);
+      color: var(--green);
+      border: 1px solid var(--green);
+    }
+
+    .mode-badge.discontinuous {
+      background: rgba(255, 180, 84, 0.15);
+      color: var(--amber);
+      border: 1px solid var(--amber);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      font-size: 13px;
+      color: var(--mute);
+      padding: 10px 0;
+    }
+
+    /* Keyboard help tooltip */
+    .keyboard-hint {
+      font-size: 12px;
+      color: var(--mute);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .kbd {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 11px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- 1. Header -->
+  <header>
+    <div class="brand-group">
+      <div class="logo-badge">⚡</div>
+      <div class="title-area">
+        <h1>Rectifier Bench <span style="font-size: 0.78em; font-weight: 500; color: var(--mute);">(24EE10042-Virinchi)</span></h1>
+        <p>Interactive Power-Electronics Simulator: Waveforms, Harmonics &amp; Conduction Paths</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="keyboard-hint">
+        <span class="kbd">Space</span> play/pause &bull; <span class="kbd">&larr;</span><span class="kbd">&rarr;</span> &plusmn;5&deg;
+      </div>
+      <button id="theme-btn" class="theme-toggle-btn" title="Toggle color scheme">
+        <span>🌓 Theme</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 2. Two cards side by side -->
+  <div class="two-cards-row">
+    
+    <!-- LEFT CARD: Schematic & Live Readouts -->
+    <div class="card schematic-card">
+      <div>
+        <div class="card-title">
+          <span id="topo-title">1-phase full-bridge thyristor-controlled rectifier</span>
+        </div>
+        <div id="ideal-vavg-formula" class="card-subtitle">
+          Ideal Vavg = (2·Vm / π) · cos(α)
+        </div>
+
+        <!-- Schematic SVG -->
+        <div class="schematic-container">
+          <svg id="schematic-svg" class="schematic-svg" viewBox="0 0 760 330" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="glow" x="-25%" y="-25%" width="150%" height="150%">
+                <feGaussianBlur stdDeviation="3.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <!-- Rendered dynamically by script -->
+          </svg>
+        </div>
+      </div>
+
+      <!-- Live readout boxes -->
+      <div class="live-readouts-grid">
+        <div class="readout-item">
+          <span class="readout-label">va</span>
+          <span id="readout-va" class="readout-val">0.0 V</span>
+        </div>
+        <div class="readout-item">
+          <span class="readout-label">vo</span>
+          <span id="readout-vo" class="readout-val">0.0 V</span>
+        </div>
+        <div class="readout-item">
+          <span class="readout-label">io</span>
+          <span id="readout-io" class="readout-val">0.00 A</span>
+        </div>
+        <div class="readout-item">
+          <span class="readout-label">is</span>
+          <span id="readout-is" class="readout-val">0.00 A</span>
+        </div>
+        <div class="readout-item">
+          <span class="readout-label">Conducting</span>
+          <span id="readout-cond" class="readout-val active-device">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT CARD: Legend Chips, Waveform Canvas & Controls -->
+    <div class="card waveform-card">
+      <div>
+        <!-- Legend chips -->
+        <div class="legend-chips-row" role="toolbar" aria-label="Waveform traces visibility">
+          <button class="legend-chip" id="chip-vs" aria-pressed="true">
+            <span class="legend-color-dot" style="background: var(--blue);"></span>
+            <span>vs / va-vb-vc</span>
+          </button>
+          <button class="legend-chip" id="chip-vo" aria-pressed="true">
+            <span class="legend-color-dot" style="background: var(--green);"></span>
+            <span>vo (load)</span>
+          </button>
+          <button class="legend-chip" id="chip-vavg" aria-pressed="true">
+            <span class="legend-color-dot" style="background: var(--violet);"></span>
+            <span>Vavg</span>
+          </button>
+          <button class="legend-chip" id="chip-io" aria-pressed="true">
+            <span class="legend-color-dot" style="background: var(--amber);"></span>
+            <span>io (load)</span>
+          </button>
+          <button class="legend-chip" id="chip-is" aria-pressed="true">
+            <span class="legend-color-dot" style="background: var(--cyan);"></span>
+            <span>is (source)</span>
+          </button>
+        </div>
+
+        <!-- Waveform canvas -->
+        <div class="canvas-container" id="canvas-container">
+          <canvas id="waveform-canvas"></canvas>
+          <div id="canvas-tooltip" class="canvas-tooltip">
+            <div class="canvas-tooltip-row">
+              <span class="canvas-tooltip-label">ωt:</span>
+              <span id="tip-wt" class="canvas-tooltip-val">0.0°</span>
+            </div>
+            <div class="canvas-tooltip-row">
+              <span class="canvas-tooltip-label">va:</span>
+              <span id="tip-va" class="canvas-tooltip-val">0.0 V</span>
+            </div>
+            <div class="canvas-tooltip-row">
+              <span class="canvas-tooltip-label">vo:</span>
+              <span id="tip-vo" class="canvas-tooltip-val">0.0 V</span>
+            </div>
+            <div class="canvas-tooltip-row">
+              <span class="canvas-tooltip-label">io:</span>
+              <span id="tip-io" class="canvas-tooltip-val">0.00 A</span>
+            </div>
+            <div class="canvas-tooltip-row">
+              <span class="canvas-tooltip-label">is:</span>
+              <span id="tip-is" class="canvas-tooltip-val">0.00 A</span>
+            </div>
+            <div class="canvas-tooltip-row">
+              <span class="canvas-tooltip-label">Device:</span>
+              <span id="tip-dev" class="canvas-tooltip-val" style="color: var(--green);">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls row -->
+      <div class="canvas-controls-row">
+        <button id="btn-play-pause" class="btn-play" aria-label="Play or pause animation">
+          <span id="play-icon">▶</span>
+          <span id="play-text">Play</span>
+        </button>
+
+        <div class="slider-time-group">
+          <label for="slider-wt">ωt</label>
+          <input type="range" id="slider-wt" min="0" max="360" step="0.5" value="30" />
+          <span id="readout-wt" class="time-degree-readout">30.0°</span>
+        </div>
+
+        <div class="speed-select-group">
+          <label>Speed:</label>
+          <div class="speed-btn-group">
+            <button class="speed-btn" data-speed="0.25">0.25x</button>
+            <button class="speed-btn" data-speed="0.5">0.5x</button>
+            <button class="speed-btn active" data-speed="1">1x</button>
+            <button class="speed-btn" data-speed="2">2x</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 3. Three control cards in a row -->
+  <div class="controls-three-row">
+
+    <!-- Card 3a: Converter topology -->
+    <div class="card">
+      <div class="card-title">Converter topology</div>
+      <div class="control-section">
+        
+        <div class="control-field">
+          <span class="control-label">Supply</span>
+          <div class="seg-group" id="seg-supply">
+            <button class="seg-btn active" data-val="1ph">Single-phase</button>
+            <button class="seg-btn" data-val="3ph">Three-phase</button>
+          </div>
+        </div>
+
+        <div class="control-field">
+          <span class="control-label">Configuration</span>
+          <div class="seg-group" id="seg-config">
+            <button class="seg-btn active" data-val="bridge">Full-bridge</button>
+            <button class="seg-btn" data-val="hw">Half-wave</button>
+          </div>
+        </div>
+
+        <div class="control-field">
+          <span class="control-label">Devices</span>
+          <div class="seg-group" id="seg-devices">
+            <button class="seg-btn" data-val="diodes">All diodes</button>
+            <button class="seg-btn active" data-val="thyristors">All thyristors</button>
+            <button class="seg-btn" data-val="semi" id="btn-dev-semi">Semi-controlled</button>
+          </div>
+        </div>
+
+        <div class="presets-container">
+          <span class="presets-label">Presets</span>
+          <div class="presets-grid">
+            <button class="preset-btn" data-preset="1ph-bridge-45-rl">1φ bridge, α=45°, RL</button>
+            <button class="preset-btn" data-preset="1ph-bridge-45-rl-dfw">Same + free-wheeling diode</button>
+            <button class="preset-btn" data-preset="3ph-bridge-60-rl">3φ bridge, α=60°, RL</button>
+            <button class="preset-btn" data-preset="3ph-bridge-120-inv">3φ inversion, α=120°</button>
+            <button class="preset-btn" data-preset="1ph-semi-60">1φ semi-converter, α=60°</button>
+            <button class="preset-btn" data-preset="3ph-semi-90">3φ semi-converter, α=90°</button>
+            <button class="preset-btn" data-preset="1ph-hw-diode-r">1φ half-wave diode, R</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Card 3b: Firing angle & free-wheeling diode -->
+    <div class="card">
+      <div class="card-title">Firing angle &amp; free-wheeling diode</div>
+      <div class="control-section">
+        
+        <div class="control-field">
+          <div class="control-field-header">
+            <span class="control-label">Firing angle (α)</span>
+            <span id="badge-alpha" class="control-val-badge">45°</span>
+          </div>
+          <input type="range" id="slider-alpha" class="range-input" min="0" max="180" step="1" value="45" />
+        </div>
+
+        <div class="control-field">
+          <span class="control-label">Free-wheeling diode (D_FW)</span>
+          <div class="seg-group" id="seg-dfw">
+            <button class="seg-btn active" data-val="0">Disconnected</button>
+            <button class="seg-btn" data-val="1">Connected</button>
+          </div>
+        </div>
+
+        <div class="info-note">
+          ℹ In semi-controlled mode the current free-wheels through a thyristor+diode of the same leg so D_FW adds nothing.
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Card 3c: Load & source parameters -->
+    <div class="card">
+      <div class="card-title">Load &amp; source parameters</div>
+      <div class="control-section">
+
+        <div class="control-field">
+          <span class="control-label">Load type</span>
+          <div class="seg-group" id="seg-load">
+            <button class="seg-btn" data-val="R">R load</button>
+            <button class="seg-btn active" data-val="RL">RL load</button>
+          </div>
+        </div>
+
+        <div class="control-field">
+          <div class="control-field-header">
+            <span class="control-label">Vm phase peak</span>
+            <span id="badge-vm" class="control-val-badge">325 V</span>
+          </div>
+          <input type="range" id="slider-vm" class="range-input" min="10" max="400" step="5" value="325" />
+        </div>
+
+        <div class="control-field">
+          <div class="control-field-header">
+            <span class="control-label">Frequency (f)</span>
+            <span id="badge-f" class="control-val-badge">50 Hz</span>
+          </div>
+          <input type="range" id="slider-f" class="range-input" min="20" max="200" step="1" value="50" />
+        </div>
+
+        <div class="control-field">
+          <div class="control-field-header">
+            <span class="control-label">Resistance (R)</span>
+            <span id="badge-r" class="control-val-badge">20 Ω</span>
+          </div>
+          <input type="range" id="slider-r" class="range-input" min="1" max="100" step="1" value="20" />
+        </div>
+
+        <div class="control-field">
+          <div class="control-field-header">
+            <span class="control-label">Inductance (L)</span>
+            <span id="badge-l" class="control-val-badge">45 mH</span>
+          </div>
+          <input type="range" id="slider-l" class="range-input" min="1" max="200" step="1" value="45" />
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 4. Results card -->
+  <div class="card results-card">
+    <div class="card-title">Results</div>
+    <div class="results-grid">
+      <div class="stat-box">
+        <span class="stat-name">V avg</span>
+        <span id="res-vavg" class="stat-value">0.0 V</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-name">V rms</span>
+        <span id="res-vrms" class="stat-value">0.0 V</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-name">I avg</span>
+        <span id="res-iavg" class="stat-value">0.00 A</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-name">I rms (load)</span>
+        <span id="res-irms" class="stat-value">0.00 A</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-name">Is rms (source)</span>
+        <span id="res-isrms" class="stat-value">0.00 A</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-name">Ideal V avg</span>
+        <span id="res-ideal-vavg" class="stat-value">0.0 V</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-name">P out (load)</span>
+        <span id="res-pout" class="stat-value">0 W</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-name">P in (real)</span>
+        <span id="res-pin" class="stat-value">0 W</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-name">S in (apparent)</span>
+        <span id="res-sin" class="stat-value">0 VA</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-name">Power factor</span>
+        <span id="res-pf" class="stat-value">0.000</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-name">Current mode</span>
+        <span id="res-mode-container" class="stat-value">
+          <span id="res-mode" class="mode-badge continuous">Continuous</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Rectifier Bench &bull; Power-Electronics Circuit Simulator &bull; Vanilla HTML5 Canvas &amp; SVG
+  </footer>
+
+</div>
+
+<script>
+/**
+ * @license
+ * Rectifier Bench - Power Electronics Simulator
+ * Single self-contained vanilla HTML/CSS/JS application.
+ */
+
+/* ==========================================================================
+   STATE & CONFIGURATION
+   ========================================================================== */
+const state = {
+  // Topology
+  supply: '1ph',         // '1ph' | '3ph'
+  config: 'bridge',      // 'bridge' | 'hw'
+  devices: 'thyristors', // 'diodes' | 'thyristors' | 'semi'
+  
+  // Controls
+  alpha: 45,             // degrees (0-180)
+  dfw: false,            // boolean
+  
+  // Load & Source
+  loadType: 'RL',        // 'R' | 'RL'
+  Vm: 325,               // V peak
+  freq: 50,              // Hz
+  R: 20,                 // Ohms
+  L: 45,                 // mH
+  
+  // Waveform Cursor & Animation
+  omegaT: 30.0,          // degrees (0-360)
+  isPlaying: false,
+  speed: 1.0,
+  
+  // Trace Visibility
+  visibleTraces: {
+    vs: true,
+    vo: true,
+    vavg: true,
+    io: true,
+    is: true
+  }
+};
+
+// Simulation Output Cache
+let simData = null;
+let lastAnimTimestamp = 0;
+
+/* ==========================================================================
+   DOM ELEMENTS
+   ========================================================================== */
+const el = {
+  // Theme
+  themeBtn: document.getElementById('theme-btn'),
+  
+  // Left Card
+  topoTitle: document.getElementById('topo-title'),
+  idealFormula: document.getElementById('ideal-vavg-formula'),
+  schematicSvg: document.getElementById('schematic-svg'),
+  readoutVa: document.getElementById('readout-va'),
+  readoutVo: document.getElementById('readout-vo'),
+  readoutIo: document.getElementById('readout-io'),
+  readoutIs: document.getElementById('readout-is'),
+  readoutCond: document.getElementById('readout-cond'),
+  
+  // Right Card Canvas & Legend
+  canvasContainer: document.getElementById('canvas-container'),
+  canvas: document.getElementById('waveform-canvas'),
+  tooltip: document.getElementById('canvas-tooltip'),
+  tipWt: document.getElementById('tip-wt'),
+  tipVa: document.getElementById('tip-va'),
+  tipVo: document.getElementById('tip-vo'),
+  tipIo: document.getElementById('tip-io'),
+  tipIs: document.getElementById('tip-is'),
+  tipDev: document.getElementById('tip-dev'),
+  
+  // Legend Chips
+  chipVs: document.getElementById('chip-vs'),
+  chipVo: document.getElementById('chip-vo'),
+  chipVavg: document.getElementById('chip-vavg'),
+  chipIo: document.getElementById('chip-io'),
+  chipIs: document.getElementById('chip-is'),
+  
+  // Canvas Controls
+  btnPlay: document.getElementById('btn-play-pause'),
+  playIcon: document.getElementById('play-icon'),
+  playText: document.getElementById('play-text'),
+  sliderWt: document.getElementById('slider-wt'),
+  readoutWt: document.getElementById('readout-wt'),
+  speedBtns: document.querySelectorAll('.speed-btn'),
+  
+  // Control Card A
+  segSupply: document.getElementById('seg-supply'),
+  segConfig: document.getElementById('seg-config'),
+  segDevices: document.getElementById('seg-devices'),
+  btnDevSemi: document.getElementById('btn-dev-semi'),
+  presetBtns: document.querySelectorAll('.preset-btn'),
+  
+  // Control Card B
+  sliderAlpha: document.getElementById('slider-alpha'),
+  badgeAlpha: document.getElementById('badge-alpha'),
+  segDfw: document.getElementById('seg-dfw'),
+  
+  // Control Card C
+  segLoad: document.getElementById('seg-load'),
+  sliderVm: document.getElementById('slider-vm'),
+  badgeVm: document.getElementById('badge-vm'),
+  sliderF: document.getElementById('slider-f'),
+  badgeF: document.getElementById('badge-f'),
+  sliderR: document.getElementById('slider-r'),
+  badgeR: document.getElementById('badge-r'),
+  sliderL: document.getElementById('slider-l'),
+  badgeL: document.getElementById('badge-l'),
+  
+  // Results
+  resVavg: document.getElementById('res-vavg'),
+  resVrms: document.getElementById('res-vrms'),
+  resIavg: document.getElementById('res-iavg'),
+  resIrms: document.getElementById('res-irms'),
+  resIsrms: document.getElementById('res-isrms'),
+  resIdealVavg: document.getElementById('res-ideal-vavg'),
+  resPout: document.getElementById('res-pout'),
+  resPin: document.getElementById('res-pin'),
+  resSin: document.getElementById('res-sin'),
+  resPf: document.getElementById('res-pf'),
+  resMode: document.getElementById('res-mode')
+};
+
+/* ==========================================================================
+   PHYSICS ENGINE & SIMULATION
+   Steady-State Rectifier Simulation with Discontinuous/Continuous Mode
+   ========================================================================== */
+function runSimulation() {
+  const N = 1440; // Samples per cycle
+  const Vm = state.Vm;
+  const f = state.freq;
+  const R = Math.max(0.1, state.R);
+  const L = state.loadType === 'RL' ? (state.L * 1e-3) : 0;
+  const alphaDeg = state.devices === 'diodes' ? 0 : state.alpha;
+  const is3ph = state.supply === '3ph';
+  const isBridge = state.config === 'bridge';
+  const isSemi = state.devices === 'semi' && isBridge;
+  const hasDfw = state.dfw;
+  const isRL = state.loadType === 'RL' && L > 0;
+
+  const dt = 1 / (f * N);
+  const dTheta = 360 / N;
+  const dThetaRad = (2 * Math.PI) / N;
+  const expDecay = isRL ? Math.exp(-R * dt / L) : 0;
+
+  // Settling cycles calculation
+  const tau = isRL ? (L / R) : 0;
+  const cyclesToSettle = isRL ? Math.min(400, Math.max(20, Math.ceil(6 * tau * f) + 6)) : 4;
+
+  // Topology Definition
+  // Topology table details:
+  // 1φ HW: n=1, step=360, nat=0, pos=[0], neg=[-1]
+  // 1φ Bridge: n=2, step=180, nat=0, pos=[0,1], neg=[1,0]
+  // 3φ HW: n=3, step=120, nat=30, pos=[0,1,2], neg=[-1]
+  // 3φ Bridge: n=6, step=60, nat=30, pos=[0,0,1,1,2,2], neg=[1,2,2,0,0,1]
+  let numEvents, stepDeg, natDeg, posPhases, negPhases, posNames, negNames;
+
+  if (!is3ph && !isBridge) {
+    // 1φ Half-Wave
+    numEvents = 1;
+    stepDeg = 360;
+    natDeg = 0;
+    posPhases = [0];
+    negPhases = [-1];
+    posNames = [state.devices === 'diodes' ? 'D1' : 'T1'];
+    negNames = [''];
+  } else if (!is3ph && isBridge) {
+    // 1φ Bridge
+    numEvents = 2;
+    stepDeg = 180;
+    natDeg = 0;
+    posPhases = [0, 1];
+    negPhases = [1, 0];
+    if (isSemi) {
+      posNames = ['T1', 'T3'];
+      negNames = ['D2', 'D4'];
+    } else if (state.devices === 'diodes') {
+      posNames = ['D1', 'D3'];
+      negNames = ['D2', 'D4'];
+    } else {
+      posNames = ['T1', 'T3'];
+      negNames = ['T2', 'T4'];
+    }
+  } else if (is3ph && !isBridge) {
+    // 3φ Half-Wave
+    numEvents = 3;
+    stepDeg = 120;
+    natDeg = 30;
+    posPhases = [0, 1, 2];
+    negPhases = [-1, -1, -1];
+    const devP = state.devices === 'diodes' ? 'D' : 'T';
+    posNames = [`${devP}1`, `${devP}2`, `${devP}3`];
+    negNames = ['', '', ''];
+  } else {
+    // 3φ Bridge
+    numEvents = 6;
+    stepDeg = 60;
+    natDeg = 30;
+    posPhases = [0, 0, 1, 1, 2, 2];
+    negPhases = [1, 2, 2, 0, 0, 1];
+    if (isSemi) {
+      posNames = ['T1', 'T1', 'T3', 'T3', 'T5', 'T5'];
+      negNames = ['D6', 'D2', 'D2', 'D4', 'D4', 'D6'];
+    } else if (state.devices === 'diodes') {
+      posNames = ['D1', 'D1', 'D3', 'D3', 'D5', 'D5'];
+      negNames = ['D6', 'D2', 'D2', 'D4', 'D4', 'D6'];
+    } else {
+      posNames = ['T1', 'T1', 'T3', 'T3', 'T5', 'T5'];
+      negNames = ['T6', 'T2', 'T2', 'T4', 'T4', 'T6'];
+    }
+  }
+
+  // Precalculate Event sample indices [0, N)
+  const eventList = [];
+  if (isSemi) {
+    // Semi-converter events occur when upper thyristor pos changes:
+    // 1φ: T1 at 0+alpha, T3 at 180+alpha
+    // 3φ: T1 at 30+alpha, T3 at 150+alpha, T5 at 270+alpha
+    if (!is3ph) {
+      const a0 = (0 + alphaDeg) % 360;
+      const a1 = (180 + alphaDeg) % 360;
+      eventList.push({ stepIdx: Math.round((a0 / 360) * N) % N, posPhase: 0, thyristor: 'T1' });
+      eventList.push({ stepIdx: Math.round((a1 / 360) * N) % N, posPhase: 1, thyristor: 'T3' });
+    } else {
+      const a0 = (30 + alphaDeg) % 360;
+      const a1 = (150 + alphaDeg) % 360;
+      const a2 = (270 + alphaDeg) % 360;
+      eventList.push({ stepIdx: Math.round((a0 / 360) * N) % N, posPhase: 0, thyristor: 'T1' });
+      eventList.push({ stepIdx: Math.round((a1 / 360) * N) % N, posPhase: 1, thyristor: 'T3' });
+      eventList.push({ stepIdx: Math.round((a2 / 360) * N) % N, posPhase: 2, thyristor: 'T5' });
+    }
+  } else {
+    for (let j = 0; j < numEvents; j++) {
+      let angle = (natDeg + j * stepDeg + alphaDeg) % 360;
+      if (angle < 0) angle += 360;
+      eventList.push({ stepIdx: Math.round((angle / 360) * N) % N, index: j });
+    }
+  }
+
+  // Helper for phase source voltages
+  function getPhases(thetaRad) {
+    if (!is3ph) {
+      const e0 = Vm * Math.sin(thetaRad);
+      const e1 = 0;
+      return [e0, e1];
+    } else {
+      const e0 = Vm * Math.sin(thetaRad);
+      const e1 = Vm * Math.sin(thetaRad - (2 * Math.PI / 3));
+      const e2 = Vm * Math.sin(thetaRad - (4 * Math.PI / 3));
+      return [e0, e1, e2];
+    }
+  }
+
+  function getPairVoltage(j, thetaRad) {
+    const e = getPhases(thetaRad);
+    const p = posPhases[j];
+    const n = negPhases[j];
+    const vp = (p >= 0 ? e[p] : 0) - (n >= 0 ? e[n] : 0);
+    return vp;
+  }
+
+  // Simulation State Variables
+  let currentI = 0;
+  let activePair = -1; // -1 = OFF
+  let isDfwActive = false;
+  let activeSemiThyristor = -1; // for semi-controlled: phase index of fired thyristor
+
+  // Arrays to hold the final recorded cycle
+  const vaArr = new Float32Array(N);
+  const vbArr = is3ph ? new Float32Array(N) : null;
+  const vcArr = is3ph ? new Float32Array(N) : null;
+  const voArr = new Float32Array(N);
+  const ioArr = new Float32Array(N);
+  const isArr = new Float32Array(N);
+  const labelsArr = new Array(N);
+  const condDevsArr = new Array(N);
+
+  const totalSteps = cyclesToSettle * N;
+  const recordStart = (cyclesToSettle - 1) * N;
+
+  for (let step = 0; step < totalSteps; step++) {
+    const sampleIdx = step % N;
+    const isRecording = step >= recordStart;
+    const thetaRad = sampleIdx * dThetaRad;
+    const thetaMidRad = thetaRad + (dThetaRad * 0.5);
+
+    const e = getPhases(thetaRad);
+
+    // 1. Check Firing Events
+    if (isSemi) {
+      // Semi-controlled logic
+      for (let ev of eventList) {
+        if (sampleIdx === ev.stepIdx) {
+          const minE = Math.min(...e);
+          if (e[ev.posPhase] > minE + 1e-3 || currentI > 1e-4) {
+            activeSemiThyristor = ev.posPhase;
+          }
+        }
+      }
+    } else {
+      // Standard (All Diodes or All Thyristors)
+      for (let ev of eventList) {
+        if (sampleIdx === ev.stepIdx) {
+          const vp = getPairVoltage(ev.index, thetaRad);
+          if (vp > 0 || (currentI > 1e-4 && !hasDfw)) {
+            activePair = ev.index;
+            isDfwActive = false;
+          }
+        }
+      }
+
+      // If diodes and currently idle, allow natural forward conduction
+      if (state.devices === 'diodes' && activePair === -1 && !isDfwActive) {
+        let bestVp = 0;
+        let bestPair = -1;
+        for (let j = 0; j < numEvents; j++) {
+          const vp = getPairVoltage(j, thetaRad);
+          if (vp > bestVp) {
+            bestVp = vp;
+            bestPair = j;
+          }
+        }
+        if (bestPair !== -1 && bestVp > 0) {
+          activePair = bestPair;
+        }
+      }
+    }
+
+    // 2. Conduction & Applied Voltage Evaluation
+    let vo = 0;
+    let is = 0;
+    let label = 'OFF';
+    let cond = { upper: '', lower: '', dfw: false, sameLeg: false };
+
+    if (isSemi) {
+      if (activeSemiThyristor !== -1) {
+        // Lowest phase naturally conducts via lower diode
+        let minVal = Infinity;
+        let negPhase = -1;
+        for (let p = 0; p < e.length; p++) {
+          if (e[p] < minVal) {
+            minVal = e[p];
+            negPhase = p;
+          }
+        }
+
+        const posPhase = activeSemiThyristor;
+        const upperDev = !is3ph ? (posPhase === 0 ? 'T1' : 'T3') : (posPhase === 0 ? 'T1' : posPhase === 1 ? 'T3' : 'T5');
+        const lowerDev = !is3ph ? (negPhase === 0 ? 'D2' : 'D4') : (negPhase === 0 ? 'D4' : negPhase === 1 ? 'D6' : 'D2');
+
+        if (posPhase === negPhase) {
+          // Free-wheeling through thyristor + diode of same leg!
+          vo = 0;
+          is = 0;
+          label = `${upperDev}+${lowerDev} (Leg)`;
+          cond = { upper: upperDev, lower: lowerDev, dfw: false, sameLeg: true };
+        } else {
+          vo = Math.max(0, e[posPhase] - minVal);
+          label = `${upperDev}+${lowerDev}`;
+          cond = { upper: upperDev, lower: lowerDev, dfw: false, sameLeg: false };
+          if (!is3ph) {
+            is = posPhase === 0 ? currentI : -currentI;
+          } else {
+            is = posPhase === 0 ? currentI : (negPhase === 0 ? -currentI : 0);
+          }
+        }
+      } else {
+        vo = 0;
+        is = 0;
+        label = 'OFF';
+      }
+    } else {
+      // Standard Mode
+      if (activePair !== -1 && !isDfwActive) {
+        const vp = getPairVoltage(activePair, thetaRad);
+        if (hasDfw && vp <= 0) {
+          // D_FW takes over
+          activePair = -1;
+          if (isRL && currentI > 1e-4) {
+            isDfwActive = true;
+            vo = 0;
+            is = 0;
+            label = 'D_FW';
+            cond = { dfw: true };
+          } else {
+            isDfwActive = false;
+            vo = 0;
+            is = 0;
+            label = 'OFF';
+          }
+        } else {
+          vo = vp;
+          const uName = posNames[activePair];
+          const lName = negNames[activePair];
+          label = lName ? `${uName}+${lName}` : uName;
+          cond = { upper: uName, lower: lName, dfw: false };
+
+          // Source current calculation
+          const posP = posPhases[activePair];
+          const negP = negPhases[activePair];
+          if (!is3ph) {
+            is = posP === 0 ? currentI : -currentI;
+          } else {
+            is = posP === 0 ? currentI : (negP === 0 ? -currentI : 0);
+          }
+        }
+      } else if (isDfwActive) {
+        vo = 0;
+        is = 0;
+        label = 'D_FW';
+        cond = { dfw: true };
+      } else {
+        vo = 0;
+        is = 0;
+        label = 'OFF';
+      }
+    }
+
+    // 3. Step Load Current
+    let nextI = 0;
+    if (!isRL) {
+      // Pure R Load
+      if (isSemi) {
+        if (activeSemiThyristor !== -1 && vo > 0) {
+          nextI = vo / R;
+        } else {
+          nextI = 0;
+          activeSemiThyristor = -1;
+          vo = 0;
+          label = 'OFF';
+          cond = {};
+        }
+      } else {
+        if (activePair !== -1) {
+          const vp = getPairVoltage(activePair, thetaRad);
+          if (vp > 0) {
+            nextI = vp / R;
+            vo = vp;
+          } else {
+            nextI = 0;
+            vo = 0;
+            activePair = -1;
+            label = 'OFF';
+            cond = {};
+          }
+        } else {
+          nextI = 0;
+          vo = 0;
+        }
+      }
+    } else {
+      // RL Load exact exponential step
+      let vMid = 0;
+      if (isSemi) {
+        if (activeSemiThyristor !== -1) {
+          const eMid = getPhases(thetaMidRad);
+          let minVal = Infinity;
+          let negPhase = -1;
+          for (let p = 0; p < eMid.length; p++) {
+            if (eMid[p] < minVal) {
+              minVal = eMid[p];
+              negPhase = p;
+            }
+          }
+          if (activeSemiThyristor !== negPhase) {
+            vMid = Math.max(0, eMid[activeSemiThyristor] - minVal);
+          } else {
+            vMid = 0;
+          }
+        }
+      } else {
+        if (activePair !== -1 && !isDfwActive) {
+          vMid = getPairVoltage(activePair, thetaMidRad);
+        } else {
+          vMid = 0;
+        }
+      }
+
+      if (isSemi ? (activeSemiThyristor !== -1) : (activePair !== -1 || isDfwActive)) {
+        const ss = vMid / R;
+        nextI = ss + (currentI - ss) * expDecay;
+        if (nextI <= 1e-5) {
+          nextI = 0;
+          activePair = -1;
+          isDfwActive = false;
+          activeSemiThyristor = -1;
+          vo = 0;
+          is = 0;
+          label = 'OFF';
+          cond = {};
+        }
+      } else {
+        nextI = 0;
+        vo = 0;
+        is = 0;
+      }
+    }
+
+    currentI = nextI;
+
+    // 4. Record the final steady-state cycle
+    if (isRecording) {
+      vaArr[sampleIdx] = e[0];
+      if (is3ph) {
+        vbArr[sampleIdx] = e[1];
+        vcArr[sampleIdx] = e[2];
+      }
+      voArr[sampleIdx] = vo;
+      ioArr[sampleIdx] = currentI;
+      isArr[sampleIdx] = is;
+      labelsArr[sampleIdx] = label;
+      condDevsArr[sampleIdx] = cond;
+    }
+  }
+
+  // Electrical Statistics computation over 1 recorded cycle
+  let sumVo = 0, sumVoSq = 0;
+  let sumIo = 0, sumIoSq = 0;
+  let sumIsSq = 0;
+  let sumPout = 0;
+  let sumPin = 0;
+  let zeroIoCount = 0;
+
+  for (let k = 0; k < N; k++) {
+    const v = voArr[k];
+    const io = ioArr[k];
+    const s = isArr[k];
+    const va = vaArr[k];
+
+    sumVo += v;
+    sumVoSq += v * v;
+    sumIo += io;
+    sumIoSq += io * io;
+    sumIsSq += s * s;
+    sumPout += v * io;
+    sumPin += va * s;
+
+    if (io <= 1e-4) zeroIoCount++;
+  }
+
+  const Vavg = sumVo / N;
+  const Vrms = Math.sqrt(sumVoSq / N);
+  const Iavg = sumIo / N;
+  const Irms = Math.sqrt(sumIoSq / N);
+  const Isrms = Math.sqrt(sumIsSq / N);
+  const Pout = sumPout / N;
+  const Pin = (is3ph ? 3 : 1) * (sumPin / N);
+  const Sin = (is3ph ? 3 : 1) * (Vm / Math.SQRT2) * Isrms;
+  const pf = Sin > 1e-3 ? Math.min(1, Math.max(0, Math.abs(Pin / Sin))) : 0;
+  const isDiscontinuous = zeroIoCount > 4;
+
+  // Ideal Vavg formula calculation (continuous current, no D_FW)
+  const aRad = (alphaDeg * Math.PI) / 180;
+  let idealVavg = 0;
+  if (!is3ph && !isBridge) {
+    idealVavg = (Vm * (1 + Math.cos(aRad))) / (2 * Math.PI);
+  } else if (!is3ph && isBridge) {
+    if (isSemi) {
+      idealVavg = (Vm * (1 + Math.cos(aRad))) / Math.PI;
+    } else {
+      idealVavg = (2 * Vm / Math.PI) * Math.cos(aRad);
+    }
+  } else if (is3ph && !isBridge) {
+    idealVavg = (3 * Math.sqrt(3) * Vm / (2 * Math.PI)) * Math.cos(aRad);
+  } else {
+    if (isSemi) {
+      idealVavg = (3 * Math.sqrt(3) * Vm / (2 * Math.PI)) * (1 + Math.cos(aRad));
+    } else {
+      idealVavg = (3 * Math.sqrt(3) * Vm / Math.PI) * Math.cos(aRad);
+    }
+  }
+
+  simData = {
+    N,
+    Vm,
+    f,
+    R,
+    L,
+    alphaDeg,
+    is3ph,
+    isBridge,
+    isSemi,
+    hasDfw,
+    va: vaArr,
+    vb: vbArr,
+    vc: vcArr,
+    vo: voArr,
+    io: ioArr,
+    is: isArr,
+    labels: labelsArr,
+    condDevs: condDevsArr,
+    stats: {
+      Vavg,
+      Vrms,
+      Iavg,
+      Irms,
+      Isrms,
+      idealVavg,
+      Pout,
+      Pin,
+      Sin,
+      pf,
+      isDiscontinuous
+    }
+  };
+
+  updateResultsUI();
+}
+
+/* ==========================================================================
+   UI TITLES & RESULTS FORMATTING
+   ========================================================================== */
+function updateTitlesAndFormulas() {
+  const is3ph = state.supply === '3ph';
+  const isBridge = state.config === 'bridge';
+  const dev = state.devices;
+  const dfw = state.dfw;
+
+  // Auto-generated title
+  const phaseStr = is3ph ? '3-phase' : '1-phase';
+  const configStr = isBridge ? 'full-bridge' : 'half-wave';
+  let devStr = 'uncontrolled diode';
+  if (dev === 'thyristors') devStr = 'thyristor-controlled';
+  else if (dev === 'semi') devStr = 'semi-controlled';
+
+  let title = `${phaseStr} ${configStr} ${devStr} rectifier`;
+  if (dfw) title += ' with free-wheeling diode';
+  el.topoTitle.textContent = title;
+
+  // Ideal Vavg formula string
+  let formula = '';
+  if (!is3ph && !isBridge) {
+    formula = 'Ideal Vavg = [Vm·(1 + cos α)] / 2π';
+  } else if (!is3ph && isBridge) {
+    if (dev === 'semi') {
+      formula = 'Ideal Vavg = [Vm·(1 + cos α)] / π';
+    } else {
+      formula = dev === 'diodes' ? 'Ideal Vavg = 2·Vm / π' : 'Ideal Vavg = (2·Vm / π) · cos(α)';
+    }
+  } else if (is3ph && !isBridge) {
+    formula = dev === 'diodes' ? 'Ideal Vavg = (3√3·Vm) / 2π' : 'Ideal Vavg = (3√3·Vm / 2π) · cos(α)';
+  } else {
+    if (dev === 'semi') {
+      formula = 'Ideal Vavg = [3√3·Vm / 2π] · (1 + cos α)';
+    } else {
+      formula = dev === 'diodes' ? 'Ideal Vavg = (3√3·Vm) / π' : 'Ideal Vavg = (3√3·Vm / π) · cos(α)';
+    }
+  }
+  el.idealFormula.textContent = `${formula} (continuous current)`;
+}
+
+function updateResultsUI() {
+  if (!simData) return;
+  const s = simData.stats;
+
+  el.resVavg.textContent = `${s.Vavg.toFixed(1)} V`;
+  el.resVrms.textContent = `${s.Vrms.toFixed(1)} V`;
+  el.resIavg.textContent = `${s.Iavg.toFixed(2)} A`;
+  el.resIrms.textContent = `${s.Irms.toFixed(2)} A`;
+  el.resIsrms.textContent = `${s.Isrms.toFixed(2)} A`;
+  el.resIdealVavg.textContent = `${s.idealVavg.toFixed(1)} V`;
+  el.resPout.textContent = `${s.Pout.toFixed(0)} W`;
+  el.resPin.textContent = `${s.Pin.toFixed(0)} W`;
+  el.resSin.textContent = `${s.Sin.toFixed(0)} VA`;
+  el.resPf.textContent = s.pf.toFixed(3);
+
+  if (s.isDiscontinuous) {
+    el.resMode.className = 'mode-badge discontinuous';
+    el.resMode.textContent = 'Discontinuous';
+  } else {
+    el.resMode.className = 'mode-badge continuous';
+    el.resMode.textContent = 'Continuous';
+  }
+}
+
+function updateLiveReadouts(deg) {
+  if (!simData) return;
+  const N = simData.N;
+  let idx = Math.round((deg / 360) * N) % N;
+  if (idx < 0) idx += N;
+
+  const va = simData.va[idx];
+  const vo = simData.vo[idx];
+  const io = simData.io[idx];
+  const is = simData.is[idx];
+  const devLabel = simData.labels[idx];
+
+  el.readoutVa.textContent = `${va >= 0 ? '+' : ''}${va.toFixed(1)} V`;
+  el.readoutVo.textContent = `${vo.toFixed(1)} V`;
+  el.readoutIo.textContent = `${io.toFixed(2)} A`;
+  el.readoutIs.textContent = `${is >= 0 ? '+' : ''}${is.toFixed(2)} A`;
+  el.readoutCond.textContent = devLabel;
+
+  // Highlight schematic devices & wires
+  highlightSchematic(simData.condDevs[idx], io > 1e-4);
+}
+
+/* ==========================================================================
+   SVG SCHEMATIC BUILDER & HIGHLIGHTER
+   ========================================================================== */
+function buildSchematic() {
+  const is3ph = state.supply === '3ph';
+  const isBridge = state.config === 'bridge';
+  const isSemi = state.devices === 'semi' && isBridge;
+  const isThy = state.devices === 'thyristors';
+  const hasDfw = state.dfw;
+  const R = state.R;
+  const L = state.L;
+  const isRL = state.loadType === 'RL';
+
+  const loadText = isRL ? `Load: R = ${R} Ω, L = ${L} mH` : `Load: R = ${R} Ω`;
+
+  let svg = `
+    <!-- Load Info Header -->
+    <text x="24" y="28" font-size="13" font-weight="600" fill="var(--mute)" font-family="var(--font)">${loadText}</text>
+  `;
+
+  // Helper for Diode / Thyristor Symbol
+  function makeDeviceSymbol(id, x, y, angle, label, isThyristor) {
+    // Standard horizontal diode points right
+    return `
+      <g id="dev-group-${id}" class="device-group" transform="translate(${x}, ${y}) rotate(${angle})">
+        <!-- Diode Triangle -->
+        <polygon class="device-body" id="dev-body-${id}" points="-12,-10 12,0 -12,10" />
+        <!-- Cathode Bar -->
+        <line class="device-body" id="dev-bar-${id}" x1="12" y1="-12" x2="12" y2="12" stroke-width="2.2" />
+        ${isThyristor ? `
+          <!-- Thyristor Gate -->
+          <polyline class="device-body" id="dev-gate-${id}" points="12,6 18,12 24,12" fill="none" stroke-width="1.8" />
+        ` : ''}
+      </g>
+      <text id="dev-lbl-${id}" class="device-label" x="${x + (angle === 90 || angle === -90 ? 24 : 0)}" y="${y - (angle === 0 ? 18 : (angle === 90 || angle === -90 ? 0 : 18))}">${label}</text>
+    `;
+  }
+
+  // 1. TOPOLOGY 1: 1-phase Half-Wave
+  if (!is3ph && !isBridge) {
+    const devLabel = isThy ? 'T1' : 'D1';
+    svg += `
+      <!-- AC Source -->
+      <g class="source-symbol" transform="translate(100, 165)">
+        <circle r="26" />
+        <path d="M -12,0 Q -6,-10 0,0 T 12,0" />
+        <text class="source-label" y="38">vs (va)</text>
+      </g>
+      <!-- Rails and Connections -->
+      <line id="wire-src-top" class="wire" x1="100" y1="139" x2="100" y2="60" />
+      <line id="wire-top-1" class="wire" x1="100" y1="60" x2="278" y2="60" />
+      
+      <!-- Device T1/D1 -->
+      ${makeDeviceSymbol('T1', 290, 60, 0, devLabel, isThy)}
+      
+      <line id="wire-top-2" class="wire" x1="302" y1="60" x2="${hasDfw ? 530 : 640}" y2="60" />
+      
+      ${hasDfw ? `
+        <!-- Free-wheeling Diode Branch -->
+        <circle class="junction-dot" cx="530" cy="60" r="3.5" />
+        <circle class="junction-dot" cx="530" cy="270" r="3.5" />
+        <line id="wire-dfw-top" class="wire" x1="530" y1="60" x2="530" y2="153" />
+        ${makeDeviceSymbol('DFW', 530, 165, -90, 'D_FW', false)}
+        <line id="wire-dfw-bot" class="wire" x1="530" y1="177" x2="530" y2="270" />
+        <line id="wire-top-3" class="wire" x1="530" y1="60" x2="640" y2="60" />
+        <line id="wire-bot-3" class="wire" x1="640" y1="270" x2="530" y2="270" />
+        <line id="wire-bot-2" class="wire" x1="530" y1="270" x2="100" y2="270" />
+      ` : `
+        <line id="wire-bot-2" class="wire" x1="640" y1="270" x2="100" y2="270" />
+      `}
+      
+      <line id="wire-src-bot" class="wire" x1="100" y1="270" x2="100" y2="191" />
+      
+      <!-- Load Box -->
+      <g transform="translate(640, 60)">
+        <rect id="schem-load-box" class="load-box" x="-25" y="0" width="50" height="210" />
+        <text x="0" y="95" font-size="14" font-weight="700" fill="var(--ink)" text-anchor="middle" font-family="var(--font)">LOAD</text>
+        <text x="0" y="115" font-size="12" fill="var(--mute)" text-anchor="middle" font-family="var(--font)">${isRL ? 'R + L' : 'R'}</text>
+        <text x="-35" y="20" font-size="16" font-weight="bold" fill="var(--green)">+</text>
+        <text x="-35" y="195" font-size="18" font-weight="bold" fill="var(--mute)">−</text>
+      </g>
+    `;
+  }
+
+  // 2. TOPOLOGY 2: 1-phase Full-Bridge (Diamond with source in middle)
+  else if (!is3ph && isBridge) {
+    const d1 = isThy || isSemi ? 'T1' : 'D1';
+    const d3 = isThy || isSemi ? 'T3' : 'D3';
+    const d2 = isThy ? 'T2' : 'D2';
+    const d4 = isThy ? 'T4' : 'D4';
+
+    svg += `
+      <!-- AC Source in Center -->
+      <g class="source-symbol" transform="translate(330, 165)">
+        <circle r="26" />
+        <path d="M -12,0 Q -6,-10 0,0 T 12,0" />
+        <text class="source-label" y="38">vs (va)</text>
+      </g>
+
+      <!-- Source Terminals A and B -->
+      <line id="wire-src-a" class="wire" x1="304" y1="165" x2="230" y2="165" />
+      <line id="wire-src-b" class="wire" x1="356" y1="165" x2="430" y2="165" />
+      
+      <!-- Terminal Junctions -->
+      <circle class="junction-dot" cx="230" cy="165" r="3.5" />
+      <circle class="junction-dot" cx="430" cy="165" r="3.5" />
+      <circle class="junction-dot" cx="330" cy="60" r="3.5" />
+      <circle class="junction-dot" cx="330" cy="270" r="3.5" />
+      <text x="215" y="169" font-size="12" font-weight="600" fill="var(--mute)">A</text>
+      <text x="442" y="169" font-size="12" font-weight="600" fill="var(--mute)">B</text>
+
+      <!-- Diamond Legs -->
+      <!-- D1: A (230,165) -> P (330,60) -->
+      <line id="wire-leg-d1-a" class="wire" x1="230" y1="165" x2="270" y2="123" />
+      ${makeDeviceSymbol('D1', 280, 112, -46, d1, isThy || isSemi)}
+      <line id="wire-leg-d1-p" class="wire" x1="290" y1="102" x2="330" y2="60" />
+
+      <!-- D3: B (430,165) -> P (330,60) -->
+      <line id="wire-leg-d3-b" class="wire" x1="430" y1="165" x2="390" y2="123" />
+      ${makeDeviceSymbol('D3', 380, 112, -134, d3, isThy || isSemi)}
+      <line id="wire-leg-d3-p" class="wire" x1="370" y1="102" x2="330" y2="60" />
+
+      <!-- D2: N (330,270) -> A (230,165) -->
+      <line id="wire-leg-d2-n" class="wire" x1="330" y1="270" x2="290" y2="228" />
+      ${makeDeviceSymbol('D2', 280, 217, -134, d2, isThy)}
+      <line id="wire-leg-d2-a" class="wire" x1="270" y1="207" x2="230" y2="165" />
+
+      <!-- D4: N (330,270) -> B (430,165) -->
+      <line id="wire-leg-d4-n" class="wire" x1="330" y1="270" x2="370" y2="228" />
+      ${makeDeviceSymbol('D4', 380, 217, -46, d4, isThy)}
+      <line id="wire-leg-d4-b" class="wire" x1="390" y1="207" x2="430" y2="165" />
+
+      <!-- Rails to Load -->
+      <line id="wire-top-p" class="wire" x1="330" y1="60" x2="${hasDfw ? 530 : 640}" y2="60" />
+      <line id="wire-bot-n" class="wire" x1="330" y1="270" x2="${hasDfw ? 530 : 640}" y2="270" />
+
+      ${hasDfw ? `
+        <!-- Free-wheeling Diode Branch -->
+        <circle class="junction-dot" cx="530" cy="60" r="3.5" />
+        <circle class="junction-dot" cx="530" cy="270" r="3.5" />
+        <line id="wire-dfw-top" class="wire" x1="530" y1="60" x2="530" y2="153" />
+        ${makeDeviceSymbol('DFW', 530, 165, -90, 'D_FW', false)}
+        <line id="wire-dfw-bot" class="wire" x1="530" y1="177" x2="530" y2="270" />
+        <line id="wire-top-3" class="wire" x1="530" y1="60" x2="640" y2="60" />
+        <line id="wire-bot-3" class="wire" x1="640" y1="270" x2="530" y2="270" />
+      ` : ''}
+
+      <!-- Load Box -->
+      <g transform="translate(640, 60)">
+        <rect id="schem-load-box" class="load-box" x="-25" y="0" width="50" height="210" />
+        <text x="0" y="95" font-size="14" font-weight="700" fill="var(--ink)" text-anchor="middle" font-family="var(--font)">LOAD</text>
+        <text x="0" y="115" font-size="12" fill="var(--mute)" text-anchor="middle" font-family="var(--font)">${isRL ? 'R + L' : 'R'}</text>
+        <text x="-35" y="20" font-size="16" font-weight="bold" fill="var(--green)">+</text>
+        <text x="-35" y="195" font-size="18" font-weight="bold" fill="var(--mute)">−</text>
+      </g>
+    `;
+  }
+
+  // 3. TOPOLOGY 3: 3-phase Half-Wave (Wye sources to cathode bus)
+  else if (is3ph && !isBridge) {
+    const devP = isThy ? 'T' : 'D';
+    svg += `
+      <!-- 3 AC Sources in Wye -->
+      <g class="source-symbol" transform="translate(100, 80)">
+        <circle r="22" />
+        <path d="M -9,0 Q -4,-8 0,0 T 9,0" />
+        <text class="source-label" y="32">va</text>
+      </g>
+      <g class="source-symbol" transform="translate(100, 165)">
+        <circle r="22" />
+        <path d="M -9,0 Q -4,-8 0,0 T 9,0" />
+        <text class="source-label" y="32">vb</text>
+      </g>
+      <g class="source-symbol" transform="translate(100, 250)">
+        <circle r="22" />
+        <path d="M -9,0 Q -4,-8 0,0 T 9,0" />
+        <text class="source-label" y="32">vc</text>
+      </g>
+
+      <!-- Neutral Star Connection -->
+      <line id="wire-n-bus" class="wire" x1="60" y1="80" x2="60" y2="285" />
+      <line id="wire-na" class="wire" x1="78" y1="80" x2="60" y2="80" />
+      <line id="wire-nb" class="wire" x1="78" y1="165" x2="60" y2="165" />
+      <line id="wire-nc" class="wire" x1="78" y1="250" x2="60" y2="250" />
+      <line id="wire-return-n" class="wire" x1="60" y1="285" x2="${hasDfw ? 530 : 640}" y2="285" />
+
+      <!-- Phase Conductors and Devices -->
+      <!-- Phase A -> D1/T1 -->
+      <line id="wire-pa-1" class="wire" x1="122" y1="80" x2="260" y2="80" />
+      ${makeDeviceSymbol('T1', 272, 80, 0, `${devP}1`, isThy)}
+      <line id="wire-pa-2" class="wire" x1="284" y1="80" x2="380" y2="80" />
+
+      <!-- Phase B -> D2/T2 -->
+      <line id="wire-pb-1" class="wire" x1="122" y1="165" x2="260" y2="165" />
+      ${makeDeviceSymbol('T2', 272, 165, 0, `${devP}2`, isThy)}
+      <line id="wire-pb-2" class="wire" x1="284" y1="165" x2="380" y2="165" />
+
+      <!-- Phase C -> D3/T3 -->
+      <line id="wire-pc-1" class="wire" x1="122" y1="250" x2="260" y2="250" />
+      ${makeDeviceSymbol('T3', 272, 250, 0, `${devP}3`, isThy)}
+      <line id="wire-pc-2" class="wire" x1="284" y1="250" x2="380" y2="250" />
+
+      <!-- Common Cathode Bus -->
+      <line id="wire-cath-bus" class="wire" x1="380" y1="60" x2="380" y2="250" />
+      <circle class="junction-dot" cx="380" cy="80" r="3.5" />
+      <circle class="junction-dot" cx="380" cy="165" r="3.5" />
+      <circle class="junction-dot" cx="380" cy="250" r="3.5" />
+      <circle class="junction-dot" cx="380" cy="60" r="3.5" />
+
+      <!-- Top Rail to Load -->
+      <line id="wire-top-p" class="wire" x1="380" y1="60" x2="${hasDfw ? 530 : 640}" y2="60" />
+
+      ${hasDfw ? `
+        <!-- Free-wheeling Diode -->
+        <circle class="junction-dot" cx="530" cy="60" r="3.5" />
+        <circle class="junction-dot" cx="530" cy="285" r="3.5" />
+        <line id="wire-dfw-top" class="wire" x1="530" y1="60" x2="530" y2="161" />
+        ${makeDeviceSymbol('DFW', 530, 173, -90, 'D_FW', false)}
+        <line id="wire-dfw-bot" class="wire" x1="530" y1="185" x2="530" y2="285" />
+        <line id="wire-top-3" class="wire" x1="530" y1="60" x2="640" y2="60" />
+        <line id="wire-bot-3" class="wire" x1="640" y1="285" x2="530" y2="285" />
+      ` : ''}
+
+      <!-- Load Box -->
+      <g transform="translate(640, 60)">
+        <rect id="schem-load-box" class="load-box" x="-25" y="0" width="50" height="225" />
+        <text x="0" y="100" font-size="14" font-weight="700" fill="var(--ink)" text-anchor="middle" font-family="var(--font)">LOAD</text>
+        <text x="0" y="120" font-size="12" fill="var(--mute)" text-anchor="middle" font-family="var(--font)">${isRL ? 'R + L' : 'R'}</text>
+        <text x="-35" y="20" font-size="16" font-weight="bold" fill="var(--green)">+</text>
+        <text x="-35" y="210" font-size="18" font-weight="bold" fill="var(--mute)">−</text>
+      </g>
+    `;
+  }
+
+  // 4. TOPOLOGY 4: 3-phase Full-Bridge (Three vertical legs)
+  else {
+    const tUpper = isThy || isSemi;
+    const tLower = isThy;
+    const devU = isThy || isSemi ? 'T' : 'D';
+    const devL = isThy ? 'T' : 'D';
+
+    svg += `
+      <!-- 3 AC Sources on Left -->
+      <g class="source-symbol" transform="translate(90, 100)">
+        <circle r="22" />
+        <path d="M -9,0 Q -4,-8 0,0 T 9,0" />
+        <text class="source-label" y="32">va</text>
+      </g>
+      <g class="source-symbol" transform="translate(90, 165)">
+        <circle r="22" />
+        <path d="M -9,0 Q -4,-8 0,0 T 9,0" />
+        <text class="source-label" y="32">vb</text>
+      </g>
+      <g class="source-symbol" transform="translate(90, 230)">
+        <circle r="22" />
+        <path d="M -9,0 Q -4,-8 0,0 T 9,0" />
+        <text class="source-label" y="32">vc</text>
+      </g>
+
+      <!-- Phase AC Feeds to Legs -->
+      <!-- Phase A -> Leg A (x=240, y=165) -->
+      <line id="wire-pa-1" class="wire" x1="112" y1="100" x2="160" y2="100" />
+      <line id="wire-pa-2" class="wire" x1="160" y1="100" x2="160" y2="165" />
+      <line id="wire-pa-3" class="wire" x1="160" y1="165" x2="240" y2="165" />
+
+      <!-- Phase B -> Leg B (x=330, y=165) -->
+      <line id="wire-pb" class="wire" x1="112" y1="165" x2="330" y2="165" />
+
+      <!-- Phase C -> Leg C (x=420, y=165) -->
+      <line id="wire-pc-1" class="wire" x1="112" y1="230" x2="180" y2="230" />
+      <line id="wire-pc-2" class="wire" x1="180" y1="230" x2="180" y2="165" />
+      <line id="wire-pc-3" class="wire" x1="180" y1="165" x2="420" y2="165" />
+
+      <!-- Rails: Positive Rail (y=60), Negative Rail (y=270) -->
+      <line id="wire-top-rail" class="wire" x1="240" y1="60" x2="${hasDfw ? 530 : 640}" y2="60" />
+      <line id="wire-bot-rail" class="wire" x1="240" y1="270" x2="${hasDfw ? 530 : 640}" y2="270" />
+
+      <!-- LEG A (x=240) -->
+      <circle class="junction-dot" cx="240" cy="60" r="3.5" />
+      <circle class="junction-dot" cx="240" cy="165" r="3.5" />
+      <circle class="junction-dot" cx="240" cy="270" r="3.5" />
+      <line id="wire-leg-a-top" class="wire" x1="240" y1="60" x2="240" y2="98" />
+      ${makeDeviceSymbol('T1', 240, 110, -90, `${devU}1`, tUpper)}
+      <line id="wire-leg-a-mid1" class="wire" x1="240" y1="122" x2="240" y2="165" />
+      <line id="wire-leg-a-mid2" class="wire" x1="240" y1="165" x2="240" y2="208" />
+      ${makeDeviceSymbol('T4', 240, 220, -90, `${devL}4`, tLower)}
+      <line id="wire-leg-a-bot" class="wire" x1="240" y1="232" x2="240" y2="270" />
+
+      <!-- LEG B (x=330) -->
+      <circle class="junction-dot" cx="330" cy="60" r="3.5" />
+      <circle class="junction-dot" cx="330" cy="165" r="3.5" />
+      <circle class="junction-dot" cx="330" cy="270" r="3.5" />
+      <line id="wire-leg-b-top" class="wire" x1="330" y1="60" x2="330" y2="98" />
+      ${makeDeviceSymbol('T3', 330, 110, -90, `${devU}3`, tUpper)}
+      <line id="wire-leg-b-mid1" class="wire" x1="330" y1="122" x2="330" y2="165" />
+      <line id="wire-leg-b-mid2" class="wire" x1="330" y1="165" x2="330" y2="208" />
+      ${makeDeviceSymbol('T6', 330, 220, -90, `${devL}6`, tLower)}
+      <line id="wire-leg-b-bot" class="wire" x1="330" y1="232" x2="330" y2="270" />
+
+      <!-- LEG C (x=420) -->
+      <circle class="junction-dot" cx="420" cy="60" r="3.5" />
+      <circle class="junction-dot" cx="420" cy="165" r="3.5" />
+      <circle class="junction-dot" cx="420" cy="270" r="3.5" />
+      <line id="wire-leg-c-top" class="wire" x1="420" y1="60" x2="420" y2="98" />
+      ${makeDeviceSymbol('T5', 420, 110, -90, `${devU}5`, tUpper)}
+      <line id="wire-leg-c-mid1" class="wire" x1="420" y1="122" x2="420" y2="165" />
+      <line id="wire-leg-c-mid2" class="wire" x1="420" y1="165" x2="420" y2="208" />
+      ${makeDeviceSymbol('T2', 420, 220, -90, `${devL}2`, tLower)}
+      <line id="wire-leg-c-bot" class="wire" x1="420" y1="232" x2="420" y2="270" />
+
+      ${hasDfw ? `
+        <!-- Free-wheeling Diode Branch -->
+        <circle class="junction-dot" cx="530" cy="60" r="3.5" />
+        <circle class="junction-dot" cx="530" cy="270" r="3.5" />
+        <line id="wire-dfw-top" class="wire" x1="530" y1="60" x2="530" y2="153" />
+        ${makeDeviceSymbol('DFW', 530, 165, -90, 'D_FW', false)}
+        <line id="wire-dfw-bot" class="wire" x1="530" y1="177" x2="530" y2="270" />
+        <line id="wire-top-3" class="wire" x1="530" y1="60" x2="640" y2="60" />
+        <line id="wire-bot-3" class="wire" x1="640" y1="270" x2="530" y2="270" />
+      ` : ''}
+
+      <!-- Load Box -->
+      <g transform="translate(640, 60)">
+        <rect id="schem-load-box" class="load-box" x="-25" y="0" width="50" height="210" />
+        <text x="0" y="95" font-size="14" font-weight="700" fill="var(--ink)" text-anchor="middle" font-family="var(--font)">LOAD</text>
+        <text x="0" y="115" font-size="12" fill="var(--mute)" text-anchor="middle" font-family="var(--font)">${isRL ? 'R + L' : 'R'}</text>
+        <text x="-35" y="20" font-size="16" font-weight="bold" fill="var(--green)">+</text>
+        <text x="-35" y="195" font-size="18" font-weight="bold" fill="var(--mute)">−</text>
+      </g>
+    `;
+  }
+
+  el.schematicSvg.innerHTML = svg;
+}
+
+function highlightSchematic(condDevs, hasCurrent) {
+  // Clear all previous active states
+  const activeEls = el.schematicSvg.querySelectorAll('.active, .active-amber');
+  for (let elem of activeEls) {
+    elem.classList.remove('active', 'active-amber');
+  }
+
+  if (!condDevs || !hasCurrent) return;
+
+  const loadBox = document.getElementById('schem-load-box');
+  if (loadBox) loadBox.classList.add('active');
+
+  // Handle D_FW conduction
+  if (condDevs.dfw) {
+    const dfwBody = document.getElementById('dev-body-DFW');
+    const dfwBar = document.getElementById('dev-bar-DFW');
+    const dfwLbl = document.getElementById('dev-lbl-DFW');
+    if (dfwBody) dfwBody.classList.add('active-amber');
+    if (dfwBar) dfwBar.classList.add('active-amber');
+    if (dfwLbl) dfwLbl.classList.add('active');
+
+    const wTop = document.getElementById('wire-dfw-top');
+    const wBot = document.getElementById('wire-dfw-bot');
+    const wT3 = document.getElementById('wire-top-3');
+    const wB3 = document.getElementById('wire-bot-3');
+    if (wTop) wTop.classList.add('active-amber');
+    if (wBot) wBot.classList.add('active-amber');
+    if (wT3) wT3.classList.add('active-amber');
+    if (wB3) wB3.classList.add('active-amber');
+    return;
+  }
+
+  // Active converter devices
+  const u = condDevs.upper;
+  const l = condDevs.lower;
+
+  function lightDevice(devId) {
+    if (!devId) return;
+    const body = document.getElementById(`dev-body-${devId}`);
+    const bar = document.getElementById(`dev-bar-${devId}`);
+    const gate = document.getElementById(`dev-gate-${devId}`);
+    const lbl = document.getElementById(`dev-lbl-${devId}`);
+    if (body) body.classList.add('active');
+    if (bar) bar.classList.add('active');
+    if (gate) gate.classList.add('active');
+    if (lbl) lbl.classList.add('active');
+  }
+
+  lightDevice(u);
+  lightDevice(l);
+
+  // Illuminate conducting wire paths
+  function lightWire(wireId) {
+    const w = document.getElementById(wireId);
+    if (w) w.classList.add('active');
+  }
+
+  if (state.supply === '1ph' && state.config === 'hw') {
+    lightWire('wire-src-top');
+    lightWire('wire-top-1');
+    lightWire('wire-top-2');
+    lightWire('wire-top-3');
+    lightWire('wire-bot-2');
+    lightWire('wire-bot-3');
+    lightWire('wire-src-bot');
+  } else if (state.supply === '1ph' && state.config === 'bridge') {
+    lightWire('wire-top-p');
+    lightWire('wire-bot-n');
+    lightWire('wire-top-3');
+    lightWire('wire-bot-3');
+    if (!condDevs.sameLeg) {
+      lightWire('wire-src-a');
+      lightWire('wire-src-b');
+    }
+    if (u === 'T1' || u === 'D1') {
+      lightWire('wire-leg-d1-a');
+      lightWire('wire-leg-d1-p');
+    }
+    if (u === 'T3' || u === 'D3') {
+      lightWire('wire-leg-d3-b');
+      lightWire('wire-leg-d3-p');
+    }
+    if (l === 'T2' || l === 'D2') {
+      lightWire('wire-leg-d2-n');
+      lightWire('wire-leg-d2-a');
+    }
+    if (l === 'T4' || l === 'D4') {
+      lightWire('wire-leg-d4-n');
+      lightWire('wire-leg-d4-b');
+    }
+  } else if (state.supply === '3ph' && state.config === 'hw') {
+    lightWire('wire-cath-bus');
+    lightWire('wire-top-p');
+    lightWire('wire-top-3');
+    lightWire('wire-return-n');
+    lightWire('wire-bot-3');
+    lightWire('wire-n-bus');
+    if (u === 'T1' || u === 'D1') {
+      lightWire('wire-pa-1');
+      lightWire('wire-pa-2');
+      lightWire('wire-na');
+    } else if (u === 'T2' || u === 'D2') {
+      lightWire('wire-pb-1');
+      lightWire('wire-pb-2');
+      lightWire('wire-nb');
+    } else if (u === 'T3' || u === 'D3') {
+      lightWire('wire-pc-1');
+      lightWire('wire-pc-2');
+      lightWire('wire-nc');
+    }
+  } else {
+    // 3ph Bridge
+    lightWire('wire-top-rail');
+    lightWire('wire-bot-rail');
+    lightWire('wire-top-3');
+    lightWire('wire-bot-3');
+
+    // Legs
+    if (u === 'T1' || u === 'D1') {
+      lightWire('wire-leg-a-top');
+      lightWire('wire-leg-a-mid1');
+      lightWire('wire-pa-1');
+      lightWire('wire-pa-2');
+      lightWire('wire-pa-3');
+    } else if (u === 'T3' || u === 'D3') {
+      lightWire('wire-leg-b-top');
+      lightWire('wire-leg-b-mid1');
+      lightWire('wire-pb');
+    } else if (u === 'T5' || u === 'D5') {
+      lightWire('wire-leg-c-top');
+      lightWire('wire-leg-c-mid1');
+      lightWire('wire-pc-1');
+      lightWire('wire-pc-2');
+      lightWire('wire-pc-3');
+    }
+
+    if (l === 'T4' || l === 'D4') {
+      lightWire('wire-leg-a-bot');
+      lightWire('wire-leg-a-mid2');
+      lightWire('wire-pa-1');
+      lightWire('wire-pa-2');
+      lightWire('wire-pa-3');
+    } else if (l === 'T6' || l === 'D6') {
+      lightWire('wire-leg-b-bot');
+      lightWire('wire-leg-b-mid2');
+      lightWire('wire-pb');
+    } else if (l === 'T2' || l === 'D2') {
+      lightWire('wire-leg-c-bot');
+      lightWire('wire-leg-c-mid2');
+      lightWire('wire-pc-1');
+      lightWire('wire-pc-2');
+      lightWire('wire-pc-3');
+    }
+  }
+}
+
+/* ==========================================================================
+   WAVEFORM CANVAS RENDERING (High-DPI Dual Panel + Conduction Strip)
+   ========================================================================== */
+function drawWaveforms(hoverDeg = null) {
+  if (!simData) return;
+
+  const canvas = el.canvas;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+
+  if (canvas.width !== Math.floor(rect.width * dpr) || canvas.height !== Math.floor(rect.height * dpr)) {
+    canvas.width = Math.floor(rect.width * dpr);
+    canvas.height = Math.floor(rect.height * dpr);
+  }
+
+  ctx.save();
+  ctx.scale(dpr, dpr);
+
+  const W = rect.width;
+  const H = rect.height;
+
+  // Clear canvas
+  ctx.clearRect(0, 0, W, H);
+
+  // Layout Metrics
+  const marginLeft = 62;
+  const marginRight = 20;
+  const pw = W - marginLeft - marginRight;
+
+  // Panel 1: Voltage (top)
+  const yVTop = 14;
+  const hV = 195;
+  const yVBottom = yVTop + hV;
+  const yVZero = yVTop + hV * 0.5;
+
+  // Panel 2: Current (middle)
+  const yITop = 226;
+  const hI = 160;
+  const yIBottom = yITop + hI;
+
+  // Panel 3: Conduction Strip (bottom)
+  const yStripTop = 404;
+  const hStrip = 24;
+
+  // X-Axis text baseline at y = 448
+
+  const N = simData.N;
+  const Vm = simData.Vm;
+  const is3phBridge = simData.is3ph && simData.isBridge;
+  const VscalePeak = is3phBridge ? (1.8 * Vm) : (1.1 * Vm);
+
+  // Scales
+  const scaleV = (hV * 0.48) / VscalePeak;
+
+  // Find max current for dynamic scaling
+  let maxIo = 0;
+  let minIs = 0;
+  let maxIs = 0;
+  for (let k = 0; k < N; k++) {
+    if (simData.io[k] > maxIo) maxIo = simData.io[k];
+    if (simData.is[k] < minIs) minIs = simData.is[k];
+    if (simData.is[k] > maxIs) maxIs = simData.is[k];
+  }
+  const isBipolar = minIs < -0.05 * Math.max(maxIo, 1);
+  const Ipeak = Math.max(1, maxIo, Math.abs(minIs), maxIs) * 1.15;
+
+  const yIZero = isBipolar ? (yITop + hI * 0.5) : (yIBottom - 10);
+  const scaleI = isBipolar ? ((hI * 0.46) / Ipeak) : ((hI - 24) / Ipeak);
+
+  function xFromDeg(deg) {
+    return marginLeft + (deg / 360) * pw;
+  }
+
+  function yFromV(v) {
+    return yVZero - v * scaleV;
+  }
+
+  function yFromI(i) {
+    return yIZero - i * scaleI;
+  }
+
+  // Styles
+  const isDarkMode = !document.documentElement.getAttribute('data-theme') || document.documentElement.getAttribute('data-theme') === 'dark';
+  const gridLineColor = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
+  const zeroLineColor = isDarkMode ? 'rgba(255, 255, 255, 0.22)' : 'rgba(0, 0, 0, 0.22)';
+  const textColor = isDarkMode ? '#8b97b3' : '#5a6885';
+
+  // 1. Draw Grid Lines (90° steps)
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = gridLineColor;
+  ctx.fillStyle = textColor;
+  ctx.font = '11px ui-monospace, SFMono-Regular, Menlo, monospace';
+
+  const xGridDegs = [0, 90, 180, 270, 360];
+  for (let deg of xGridDegs) {
+    const x = xFromDeg(deg);
+    // Vertical grid
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(x, yVTop);
+    ctx.lineTo(x, yIBottom);
+    ctx.stroke();
+
+    // X Axis label at bottom
+    ctx.setLineDash([]);
+    ctx.textAlign = 'center';
+    ctx.fillText(`${deg}°`, x, 446);
+  }
+
+  // 2. Voltage Panel Grids & Labels
+  // Zero line
+  ctx.strokeStyle = zeroLineColor;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.moveTo(marginLeft, yVZero);
+  ctx.lineTo(marginLeft + pw, yVZero);
+  ctx.stroke();
+
+  // Dotted +/- Vm lines
+  ctx.strokeStyle = gridLineColor;
+  ctx.setLineDash([2, 4]);
+  ctx.beginPath();
+  ctx.moveTo(marginLeft, yFromV(Vm));
+  ctx.lineTo(marginLeft + pw, yFromV(Vm));
+  ctx.moveTo(marginLeft, yFromV(-Vm));
+  ctx.lineTo(marginLeft + pw, yFromV(-Vm));
+  ctx.stroke();
+
+  // Voltage Y-ticks
+  ctx.setLineDash([]);
+  ctx.textAlign = 'right';
+  ctx.fillText(`${Vm.toFixed(0)}V`, marginLeft - 8, yFromV(Vm) + 4);
+  ctx.fillText('0V', marginLeft - 8, yVZero + 4);
+  ctx.fillText(`-${Vm.toFixed(0)}V`, marginLeft - 8, yFromV(-Vm) + 4);
+  if (is3phBridge) {
+    const lineV = Math.sqrt(3) * Vm;
+    ctx.fillText(`${lineV.toFixed(0)}V`, marginLeft - 8, yFromV(lineV) + 4);
+  }
+
+  // Voltage Panel Header Tag
+  ctx.textAlign = 'left';
+  ctx.font = 'bold 11px var(--font)';
+  ctx.fillStyle = textColor;
+  ctx.fillText('VOLTAGE [V]', marginLeft + 6, yVTop + 14);
+
+  // 3. Current Panel Grids & Labels
+  ctx.strokeStyle = zeroLineColor;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.moveTo(marginLeft, yIZero);
+  ctx.lineTo(marginLeft + pw, yIZero);
+  ctx.stroke();
+
+  // Current Y-ticks
+  ctx.setLineDash([]);
+  ctx.font = '11px ui-monospace, SFMono-Regular, Menlo, monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText('0A', marginLeft - 8, yIZero + 4);
+  ctx.fillText(`${(Ipeak * 0.8).toFixed(1)}A`, marginLeft - 8, yFromI(Ipeak * 0.8) + 4);
+  if (isBipolar) {
+    ctx.fillText(`-${(Ipeak * 0.8).toFixed(1)}A`, marginLeft - 8, yFromI(-Ipeak * 0.8) + 4);
+  }
+
+  // Current Panel Header Tag
+  ctx.textAlign = 'left';
+  ctx.font = 'bold 11px var(--font)';
+  ctx.fillText('CURRENT [A]', marginLeft + 6, yITop + 14);
+
+  // 4. DRAW TRACES
+
+  // A. Source Phase Voltages (Dashed)
+  if (state.visibleTraces.vs) {
+    ctx.lineWidth = 1.6;
+    ctx.setLineDash([4, 4]);
+
+    // Phase A (Blue)
+    ctx.strokeStyle = '#5aa9ff';
+    ctx.beginPath();
+    for (let k = 0; k < N; k++) {
+      const x = xFromDeg((k / N) * 360);
+      const y = yFromV(simData.va[k]);
+      if (k === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // 3-Phase B (Purple) & C (Pink)
+    if (simData.is3ph) {
+      ctx.strokeStyle = '#b79cff';
+      ctx.beginPath();
+      for (let k = 0; k < N; k++) {
+        const x = xFromDeg((k / N) * 360);
+        const y = yFromV(simData.vb[k]);
+        if (k === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.strokeStyle = '#f472b6';
+      ctx.beginPath();
+      for (let k = 0; k < N; k++) {
+        const x = xFromDeg((k / N) * 360);
+        const y = yFromV(simData.vc[k]);
+        if (k === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+  }
+
+  // B. Output Voltage Vo (Solid Green 2.5px)
+  if (state.visibleTraces.vo) {
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([]);
+    ctx.strokeStyle = '#3ddc97';
+    ctx.beginPath();
+    for (let k = 0; k < N; k++) {
+      const x = xFromDeg((k / N) * 360);
+      const y = yFromV(simData.vo[k]);
+      if (k === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // C. Vavg (Dashed Violet)
+  if (state.visibleTraces.vavg) {
+    const yAvg = yFromV(simData.stats.Vavg);
+    ctx.lineWidth = 1.8;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeStyle = '#c084fc';
+    ctx.beginPath();
+    ctx.moveTo(marginLeft, yAvg);
+    ctx.lineTo(marginLeft + pw, yAvg);
+    ctx.stroke();
+  }
+
+  // D. Source Current Is (Solid Cyan 2px)
+  if (state.visibleTraces.is) {
+    ctx.lineWidth = 2;
+    ctx.setLineDash([]);
+    ctx.strokeStyle = '#22d3ee';
+    ctx.beginPath();
+    for (let k = 0; k < N; k++) {
+      const x = xFromDeg((k / N) * 360);
+      const y = yFromI(simData.is[k]);
+      if (k === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // E. Load Current Io (Solid Amber 2.5px)
+  if (state.visibleTraces.io) {
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([]);
+    ctx.strokeStyle = '#ffb454';
+    ctx.beginPath();
+    for (let k = 0; k < N; k++) {
+      const x = xFromDeg((k / N) * 360);
+      const y = yFromI(simData.io[k]);
+      if (k === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // 5. DRAW CONDUCTION STRIP
+  ctx.setLineDash([]);
+  ctx.save();
+  // Find intervals of identical device label
+  let curLabel = simData.labels[0];
+  let startK = 0;
+  for (let k = 1; k <= N; k++) {
+    if (k === N || simData.labels[k] !== curLabel) {
+      const xStart = xFromDeg((startK / N) * 360);
+      const xEnd = xFromDeg((k / N) * 360);
+      const spanW = xEnd - xStart;
+
+      // Color scheme based on state
+      if (curLabel === 'OFF') {
+        ctx.fillStyle = isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'rgba(226, 232, 240, 0.8)';
+        ctx.strokeStyle = isDarkMode ? '#334155' : '#cbd5e1';
+      } else if (curLabel === 'D_FW') {
+        ctx.fillStyle = 'rgba(255, 180, 84, 0.25)';
+        ctx.strokeStyle = '#ffb454';
+      } else if (curLabel.includes('(Leg)')) {
+        ctx.fillStyle = 'rgba(183, 156, 255, 0.25)';
+        ctx.strokeStyle = '#b79cff';
+      } else {
+        ctx.fillStyle = 'rgba(61, 220, 151, 0.25)';
+        ctx.strokeStyle = '#3ddc97';
+      }
+
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.rect(xStart, yStripTop, spanW, hStrip);
+      ctx.fill();
+      ctx.stroke();
+
+      // Label text
+      if (spanW > 28) {
+        ctx.fillStyle = isDarkMode ? '#e6ecf8' : '#121826';
+        ctx.font = 'bold 10px ui-monospace, SFMono-Regular, Menlo, monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(curLabel, xStart + spanW * 0.5, yStripTop + hStrip * 0.5);
+      }
+
+      startK = k;
+      if (k < N) curLabel = simData.labels[k];
+    }
+  }
+  ctx.restore();
+
+  // 6. VERTICAL CURSOR AT ωt
+  const curDeg = state.omegaT;
+  const xCur = xFromDeg(curDeg);
+  let idxCur = Math.round((curDeg / 360) * N) % N;
+  if (idxCur < 0) idxCur += N;
+
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 3]);
+  ctx.beginPath();
+  ctx.moveTo(xCur, yVTop);
+  ctx.lineTo(xCur, yStripTop + hStrip);
+  ctx.stroke();
+
+  // Glowing Marker Dots on Traces
+  ctx.setLineDash([]);
+  function drawMarkerDot(y, color) {
+    ctx.fillStyle = color;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.arc(xCur, y, 4.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  if (state.visibleTraces.vo) drawMarkerDot(yFromV(simData.vo[idxCur]), '#3ddc97');
+  if (state.visibleTraces.io) drawMarkerDot(yFromI(simData.io[idxCur]), '#ffb454');
+  if (state.visibleTraces.is) drawMarkerDot(yFromI(simData.is[idxCur]), '#22d3ee');
+
+  // 7. HOVER CROSSHAIR & FLOATING TOOLTIP
+  if (hoverDeg !== null && hoverDeg >= 0 && hoverDeg <= 360) {
+    const xHover = xFromDeg(hoverDeg);
+    ctx.strokeStyle = 'rgba(90, 169, 255, 0.6)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(xHover, yVTop);
+    ctx.lineTo(xHover, yStripTop + hStrip);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+/* ==========================================================================
+   CANVAS INTERACTION (Click/Drag, Hover Tooltip)
+   ========================================================================== */
+let isDraggingCanvas = false;
+
+function getCanvasDegFromEvent(e) {
+  const rect = el.canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const marginLeft = 62;
+  const marginRight = 20;
+  const pw = rect.width - marginLeft - marginRight;
+  let deg = ((x - marginLeft) / pw) * 360;
+  deg = Math.max(0, Math.min(360, deg));
+  return Math.round(deg * 2) / 2; // snap to 0.5 step
+}
+
+function updateOmegaT(deg) {
+  state.omegaT = deg;
+  el.sliderWt.value = deg;
+  el.readoutWt.textContent = `${deg.toFixed(1)}°`;
+  updateLiveReadouts(deg);
+  drawWaveforms();
+}
+
+el.canvas.addEventListener('mousedown', (e) => {
+  isDraggingCanvas = true;
+  const deg = getCanvasDegFromEvent(e);
+  updateOmegaT(deg);
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (isDraggingCanvas) {
+    const deg = getCanvasDegFromEvent(e);
+    updateOmegaT(deg);
+  }
+});
+
+window.addEventListener('mouseup', () => {
+  isDraggingCanvas = false;
+});
+
+// Canvas Hover Tooltip
+el.canvas.addEventListener('mousemove', (e) => {
+  if (!simData) return;
+  const deg = getCanvasDegFromEvent(e);
+  const rect = el.canvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+
+  let idx = Math.round((deg / 360) * simData.N) % simData.N;
+  if (idx < 0) idx += simData.N;
+
+  el.tipWt.textContent = `${deg.toFixed(1)}°`;
+  el.tipVa.textContent = `${simData.va[idx].toFixed(1)} V`;
+  el.tipVo.textContent = `${simData.vo[idx].toFixed(1)} V`;
+  el.tipIo.textContent = `${simData.io[idx].toFixed(2)} A`;
+  el.tipIs.textContent = `${simData.is[idx].toFixed(2)} A`;
+  el.tipDev.textContent = simData.labels[idx];
+
+  el.tooltip.style.display = 'block';
+  // Position tooltip safely inside canvas boundary
+  let leftPos = mouseX + 15;
+  if (leftPos + 160 > rect.width) leftPos = mouseX - 170;
+  let topPos = mouseY - 40;
+  if (topPos < 10) topPos = 10;
+  if (topPos + 140 > rect.height) topPos = rect.height - 150;
+
+  el.tooltip.style.left = `${leftPos}px`;
+  el.tooltip.style.top = `${topPos}px`;
+
+  drawWaveforms(deg);
+});
+
+el.canvas.addEventListener('mouseleave', () => {
+  el.tooltip.style.display = 'none';
+  drawWaveforms(null);
+});
+
+// Touch support for mobile canvas drag
+el.canvas.addEventListener('touchstart', (e) => {
+  if (e.touches.length > 0) {
+    isDraggingCanvas = true;
+    const deg = getCanvasDegFromEvent(e.touches[0]);
+    updateOmegaT(deg);
+  }
+}, { passive: true });
+
+el.canvas.addEventListener('touchmove', (e) => {
+  if (isDraggingCanvas && e.touches.length > 0) {
+    const deg = getCanvasDegFromEvent(e.touches[0]);
+    updateOmegaT(deg);
+  }
+}, { passive: true });
+
+el.canvas.addEventListener('touchend', () => {
+  isDraggingCanvas = false;
+});
+
+/* ==========================================================================
+   ANIMATION & TIME CONTROLS
+   90°/s x speed with requestAnimationFrame
+   ========================================================================== */
+function animate(timestamp) {
+  if (!lastAnimTimestamp) lastAnimTimestamp = timestamp;
+  const dtSec = (timestamp - lastAnimTimestamp) / 1000;
+  lastAnimTimestamp = timestamp;
+
+  if (state.isPlaying) {
+    const dTheta = 90 * state.speed * dtSec;
+    let nextDeg = state.omegaT + dTheta;
+    if (nextDeg >= 360) nextDeg = nextDeg % 360;
+    updateOmegaT(Math.round(nextDeg * 2) / 2);
+  }
+
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+
+function togglePlay() {
+  state.isPlaying = !state.isPlaying;
+  if (state.isPlaying) {
+    el.btnPlay.classList.add('playing');
+    el.playIcon.textContent = '⏸';
+    el.playText.textContent = 'Pause';
+  } else {
+    el.btnPlay.classList.remove('playing');
+    el.playIcon.textContent = '▶';
+    el.playText.textContent = 'Play';
+  }
+}
+
+el.btnPlay.addEventListener('click', togglePlay);
+
+el.sliderWt.addEventListener('input', (e) => {
+  updateOmegaT(parseFloat(e.target.value));
+});
+
+for (let btn of el.speedBtns) {
+  btn.addEventListener('click', (e) => {
+    for (let b of el.speedBtns) b.classList.remove('active');
+    btn.classList.add('active');
+    state.speed = parseFloat(btn.dataset.speed);
+  });
+}
+
+// Legend Chips
+function setupChip(btn, traceKey) {
+  btn.addEventListener('click', () => {
+    const isVis = !state.visibleTraces[traceKey];
+    state.visibleTraces[traceKey] = isVis;
+    btn.setAttribute('aria-pressed', isVis ? 'true' : 'false');
+    drawWaveforms();
+  });
+}
+setupChip(el.chipVs, 'vs');
+setupChip(el.chipVo, 'vo');
+setupChip(el.chipVavg, 'vavg');
+setupChip(el.chipIo, 'io');
+setupChip(el.chipIs, 'is');
+
+/* ==========================================================================
+   KEYBOARD SHORTCUTS
+   Space = Play/Pause, Left/Right = ±5°
+   ========================================================================== */
+window.addEventListener('keydown', (e) => {
+  // Ignore inside text input if any
+  if (e.target.tagName === 'INPUT' && e.target.type === 'text') return;
+
+  if (e.code === 'Space') {
+    e.preventDefault();
+    togglePlay();
+  } else if (e.code === 'ArrowRight') {
+    e.preventDefault();
+    let deg = (state.omegaT + 5) % 360;
+    updateOmegaT(deg);
+  } else if (e.code === 'ArrowLeft') {
+    e.preventDefault();
+    let deg = (state.omegaT - 5 + 360) % 360;
+    updateOmegaT(deg);
+  }
+});
+
+/* ==========================================================================
+   CIRCUIT PARAMETERS & CONTROLS BINDING
+   ========================================================================== */
+function recomputeAll() {
+  updateTitlesAndFormulas();
+  buildSchematic();
+  runSimulation();
+  updateLiveReadouts(state.omegaT);
+  drawWaveforms();
+}
+
+// Supply Segments
+el.segSupply.addEventListener('click', (e) => {
+  const btn = e.target.closest('.seg-btn');
+  if (!btn) return;
+  for (let b of el.segSupply.children) b.classList.remove('active');
+  btn.classList.add('active');
+  state.supply = btn.dataset.val;
+  recomputeAll();
+});
+
+// Config Segments (Full-bridge / Half-wave)
+el.segConfig.addEventListener('click', (e) => {
+  const btn = e.target.closest('.seg-btn');
+  if (!btn) return;
+
+  const val = btn.dataset.val;
+  if (val === 'hw') {
+    // Semi-controlled is disabled for half-wave
+    el.btnDevSemi.disabled = true;
+    if (state.devices === 'semi') {
+      state.devices = 'thyristors';
+      for (let b of el.segDevices.children) b.classList.remove('active');
+      el.segDevices.querySelector('[data-val="thyristors"]').classList.add('active');
+    }
+  } else {
+    el.btnDevSemi.disabled = false;
+  }
+
+  for (let b of el.segConfig.children) b.classList.remove('active');
+  btn.classList.add('active');
+  state.config = val;
+  recomputeAll();
+});
+
+// Device Segments
+el.segDevices.addEventListener('click', (e) => {
+  const btn = e.target.closest('.seg-btn');
+  if (!btn || btn.disabled) return;
+
+  for (let b of el.segDevices.children) b.classList.remove('active');
+  btn.classList.add('active');
+  state.devices = btn.dataset.val;
+
+  // Grey out alpha slider if diodes
+  const isDiodes = state.devices === 'diodes';
+  el.sliderAlpha.disabled = isDiodes;
+  el.badgeAlpha.style.opacity = isDiodes ? '0.35' : '1';
+
+  recomputeAll();
+});
+
+// Alpha Slider
+el.sliderAlpha.addEventListener('input', (e) => {
+  state.alpha = parseInt(e.target.value);
+  el.badgeAlpha.textContent = `${state.alpha}°`;
+  recomputeAll();
+});
+
+// D_FW Segments
+el.segDfw.addEventListener('click', (e) => {
+  const btn = e.target.closest('.seg-btn');
+  if (!btn) return;
+  for (let b of el.segDfw.children) b.classList.remove('active');
+  btn.classList.add('active');
+  state.dfw = btn.dataset.val === '1';
+  recomputeAll();
+});
+
+// Load Type Segments
+el.segLoad.addEventListener('click', (e) => {
+  const btn = e.target.closest('.seg-btn');
+  if (!btn) return;
+  for (let b of el.segLoad.children) b.classList.remove('active');
+  btn.classList.add('active');
+  state.loadType = btn.dataset.val;
+
+  // Grey out L slider if R load
+  const isR = state.loadType === 'R';
+  el.sliderL.disabled = isR;
+  el.badgeL.style.opacity = isR ? '0.35' : '1';
+
+  recomputeAll();
+});
+
+// Sliders: Vm, f, R, L
+el.sliderVm.addEventListener('input', (e) => {
+  state.Vm = parseFloat(e.target.value);
+  el.badgeVm.textContent = `${state.Vm} V`;
+  recomputeAll();
+});
+
+el.sliderF.addEventListener('input', (e) => {
+  state.freq = parseFloat(e.target.value);
+  el.badgeF.textContent = `${state.freq} Hz`;
+  recomputeAll();
+});
+
+el.sliderR.addEventListener('input', (e) => {
+  state.R = parseFloat(e.target.value);
+  el.badgeR.textContent = `${state.R} Ω`;
+  recomputeAll();
+});
+
+el.sliderL.addEventListener('input', (e) => {
+  state.L = parseFloat(e.target.value);
+  el.badgeL.textContent = `${state.L} mH`;
+  recomputeAll();
+});
+
+/* ==========================================================================
+   PRESETS ENGINE
+   ========================================================================== */
+function applyPreset(name) {
+  if (name === '1ph-bridge-45-rl') {
+    state.supply = '1ph';
+    state.config = 'bridge';
+    state.devices = 'thyristors';
+    state.alpha = 45;
+    state.dfw = false;
+    state.loadType = 'RL';
+    state.Vm = 325;
+    state.freq = 50;
+    state.R = 20;
+    state.L = 45;
+  } else if (name === '1ph-bridge-45-rl-dfw') {
+    state.supply = '1ph';
+    state.config = 'bridge';
+    state.devices = 'thyristors';
+    state.alpha = 45;
+    state.dfw = true;
+    state.loadType = 'RL';
+    state.Vm = 325;
+    state.freq = 50;
+    state.R = 20;
+    state.L = 45;
+  } else if (name === '3ph-bridge-60-rl') {
+    state.supply = '3ph';
+    state.config = 'bridge';
+    state.devices = 'thyristors';
+    state.alpha = 60;
+    state.dfw = false;
+    state.loadType = 'RL';
+    state.Vm = 325;
+    state.freq = 50;
+    state.R = 20;
+    state.L = 45;
+  } else if (name === '3ph-bridge-120-inv') {
+    state.supply = '3ph';
+    state.config = 'bridge';
+    state.devices = 'thyristors';
+    state.alpha = 120;
+    state.dfw = false;
+    state.loadType = 'RL';
+    state.Vm = 325;
+    state.freq = 50;
+    state.R = 20;
+    state.L = 45;
+  } else if (name === '1ph-semi-60') {
+    state.supply = '1ph';
+    state.config = 'bridge';
+    state.devices = 'semi';
+    state.alpha = 60;
+    state.dfw = false;
+    state.loadType = 'RL';
+    state.Vm = 325;
+    state.freq = 50;
+    state.R = 20;
+    state.L = 45;
+  } else if (name === '3ph-semi-90') {
+    state.supply = '3ph';
+    state.config = 'bridge';
+    state.devices = 'semi';
+    state.alpha = 90;
+    state.dfw = false;
+    state.loadType = 'RL';
+    state.Vm = 325;
+    state.freq = 50;
+    state.R = 20;
+    state.L = 45;
+  } else if (name === '1ph-hw-diode-r') {
+    state.supply = '1ph';
+    state.config = 'hw';
+    state.devices = 'diodes';
+    state.alpha = 0;
+    state.dfw = false;
+    state.loadType = 'R';
+    state.Vm = 325;
+    state.freq = 50;
+    state.R = 20;
+    state.L = 45;
+  }
+
+  // Sync UI Controls
+  syncAllControlsToState();
+  recomputeAll();
+}
+
+function syncAllControlsToState() {
+  // Supply
+  for (let b of el.segSupply.children) {
+    b.classList.toggle('active', b.dataset.val === state.supply);
+  }
+
+  // Config
+  for (let b of el.segConfig.children) {
+    b.classList.toggle('active', b.dataset.val === state.config);
+  }
+  el.btnDevSemi.disabled = state.config === 'hw';
+
+  // Devices
+  for (let b of el.segDevices.children) {
+    b.classList.toggle('active', b.dataset.val === state.devices);
+  }
+  const isDiodes = state.devices === 'diodes';
+  el.sliderAlpha.disabled = isDiodes;
+  el.badgeAlpha.style.opacity = isDiodes ? '0.35' : '1';
+
+  // Alpha
+  el.sliderAlpha.value = state.alpha;
+  el.badgeAlpha.textContent = `${state.alpha}°`;
+
+  // D_FW
+  for (let b of el.segDfw.children) {
+    b.classList.toggle('active', (b.dataset.val === '1') === state.dfw);
+  }
+
+  // Load
+  for (let b of el.segLoad.children) {
+    b.classList.toggle('active', b.dataset.val === state.loadType);
+  }
+  const isR = state.loadType === 'R';
+  el.sliderL.disabled = isR;
+  el.badgeL.style.opacity = isR ? '0.35' : '1';
+
+  // Sliders
+  el.sliderVm.value = state.Vm;
+  el.badgeVm.textContent = `${state.Vm} V`;
+  el.sliderF.value = state.freq;
+  el.badgeF.textContent = `${state.freq} Hz`;
+  el.sliderR.value = state.R;
+  el.badgeR.textContent = `${state.R} Ω`;
+  el.sliderL.value = state.L;
+  el.badgeL.textContent = `${state.L} mH`;
+}
+
+for (let btn of el.presetBtns) {
+  btn.addEventListener('click', (e) => {
+    applyPreset(btn.dataset.preset);
+  });
+}
+
+/* ==========================================================================
+   COLOR SCHEME THEME TOGGLE
+   ========================================================================== */
+let currentTheme = 'dark';
+el.themeBtn.addEventListener('click', () => {
+  const root = document.documentElement;
+  if (currentTheme === 'dark') {
+    currentTheme = 'light';
+    root.setAttribute('data-theme', 'light');
+    el.themeBtn.innerHTML = '<span>☀️ Light</span>';
+  } else {
+    currentTheme = 'dark';
+    root.setAttribute('data-theme', 'dark');
+    el.themeBtn.innerHTML = '<span>🌙 Dark</span>';
+  }
+  drawWaveforms();
+});
+
+// Resize handler
+window.addEventListener('resize', () => {
+  drawWaveforms();
+});
+
+/* ==========================================================================
+   INITIALIZATION
+   ========================================================================== */
+syncAllControlsToState();
+recomputeAll();
+</script>
+
+</body>
+</html>

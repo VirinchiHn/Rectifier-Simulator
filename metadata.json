@@ -1,0 +1,6 @@
+{
+  "name": "Rectifier Bench",
+  "description": "Interactive power-electronics rectifier simulator with live waveforms, SVG schematics, and analytical results.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
